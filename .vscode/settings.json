@@ -1,0 +1,21 @@
+{
+    "editor.rulers": [
+        72,
+        80
+    ],
+    "files.watcherExclude": {
+        "**/.git/": true,
+        "**/build/**": true,
+    },
+    "editor.tabSize": 4,
+    "go.useLanguageServer": true,
+    "search.exclude": {
+        "build/**/*": true,
+    },
+    "vim.easymotion": true,
+    "vim.handleKeys": {
+        "<C-a>": false,
+        "<C-f>": false
+    },
+    "vim.leader": ",",
+}
