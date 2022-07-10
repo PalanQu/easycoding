@@ -1,0 +1,8 @@
+# Go related files.
+*.pb.go
+*.pb.gw.go
+*.pb.validate.go
+*.swagger.json
+
+# coverage file
+coverage.out

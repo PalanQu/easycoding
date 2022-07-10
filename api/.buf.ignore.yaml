@@ -1,0 +1,9 @@
+# This file is not buf builtin module, managed by cmd/manage_api/main.go
+
+# TODO(qujiabao): remove this file after buf generate support exclude dir
+#   The following link is not the best solution
+#   https://github.com/bufbuild/buf/issues/188
+
+ignore_modules:
+  - google
+  - validate

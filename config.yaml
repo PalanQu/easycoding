@@ -1,0 +1,14 @@
+database:
+    db_name: test
+    host: mysql
+    password: "123456"
+    port: "3306"
+    user: root
+log:
+    dir: ""
+    level: INFO
+server:
+    gateway_port: "10000"
+    grpc_port: "10001"
+    restart_on_error: false
+    swagger_port: "10002"

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ping;
+
+option go_package = 'easycoding/api/ping';
+
+import "validate/validate.proto";
+
+message PingRequest {
+    string req = 1[(validate.rules).string = {min_len: 0, max_len: 10}];
+}
+
+message PingResponse {
+    string res = 1;
+}

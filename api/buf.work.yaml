@@ -1,0 +1,6 @@
+version: v1
+directories:
+  - third_party_apis
+  - payment_apis
+  - pet_apis
+  - ping_apis

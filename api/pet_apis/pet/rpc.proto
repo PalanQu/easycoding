@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package pet;
+
+option go_package = 'easycoding/api/pet';
+
+import "google/api/annotations.proto";
+import "pet/pet.proto";
+
+service PetStoreSvc {
+  rpc GetPet(GetPetRequest) returns (GetPetResponse) {
+        option (google.api.http) = {
+            get: "/v1/pet",
+        };
+  }
+  rpc PutPet(PutPetRequest) returns (PutPetResponse) {
+        option (google.api.http) = {
+            put: "/v1/pet",
+            body: "*",
+        };
+  }
+  rpc DeletePet(DeletePetRequest) returns (DeletePetResponse) {
+        option (google.api.http) = {
+            delete: "/v1/pet",
+        };
+  }
+}

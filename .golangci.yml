@@ -1,0 +1,28 @@
+linters-settings:
+  govet:
+    check-shadowing: true
+    enable:
+      - fieldalignment
+  gocyclo:
+    min-complexity: 15
+  maligned:
+    suggest-new: true
+  lll:
+    line-length: 160
+  goimports:
+    local-prefixes: easycoding
+  gocritic:
+    enabled-tags:
+    - diagnostic
+    - performance
+    - style
+    - experimental
+    disabled-checks:
+    - hugeParam
+    - whyNoLint
+
+run:
+  deadline: 10m
+  skip-dirs:
+  - api
+  - build

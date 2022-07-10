@@ -1,0 +1,104 @@
+---
+
+# Configuration of git pre-commit hooks:
+#       https://pre-commit.com/
+#
+# In a newly cloned git repo, run the following commands to install the
+# pre-commit hooks into .git/hooks/pre-commit:
+#       pip3 install pre-commit
+#       pre-commit install
+#
+# After that, `git commit` will automatically run the pre-commit hooks.
+#
+# Run all checks:
+#       pre-commit run --all
+#
+# Run trailing-whitespace check for common/workspace/*.go:
+#       pre-commit run trailing-whitespace --files common/workspace/*.go
+#
+# Run all checks for common/workspace/*.go::
+#       pre-commit run --files common/workspace/*.go
+
+
+# Skip pre-commit hooks:
+#
+# In some situations, for example, when fixing legacy codes, it is desirable to
+# skip pre-commit hooks.  You can do so via the -n option of git-commit, as the
+# follows:
+#       git commit -n
+# However, please DO NOT use this unless you absolutely have to.
+
+exclude: >
+    (?x)^(
+        .*\.pb\.go|                 # Protobuf files
+        .*\.pb\.gw\.go|             # Protobuf gateway files
+        .*\.pb\.validate\.go|       # Protobuf validate files
+        .*\.swagger\.json|          # Swagger json files
+    )$
+
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+  - id: trailing-whitespace
+    stages:
+    - commit
+  - id: check-added-large-files
+    stages:
+    - commit
+  - id: check-case-conflict
+    stages:
+    - commit
+  - id: check-docstring-first
+    stages:
+    - commit
+  - id: check-executables-have-shebangs
+    stages:
+    - commit
+  - id: check-json
+    stages:
+    - commit
+  - id: check-symlinks
+    stages:
+    - commit
+  - id: check-yaml
+    stages:
+    - commit
+  - id: double-quote-string-fixer
+    stages:
+    - commit
+  - id: end-of-file-fixer
+    stages:
+    - commit
+  - id: mixed-line-ending
+    stages:
+    - commit
+  - id: pretty-format-json
+    stages:
+    - commit
+    args:
+    - --autofix
+    - --indent=4
+  - id: sort-simple-yaml
+    stages:
+    - commit
+
+- repo: local
+  # golangci-lint does not support {entry} file1 file2 ... which
+  # the file1 and file2 in different directory
+  hooks:
+  - id: golint
+    entry: go run cmd/lint/main.go go
+    language: system
+    name: lint .go source files
+    files: ^.*\.go$
+    stages:
+    - commit
+  # buf lint does not support {entry} file1 file2 ...
+  - id: buflint
+    entry: go run cmd/lint/main.go proto
+    language: system
+    name: lint .proto source files
+    files: ^.*\.proto$
+    stages:
+    - commit

@@ -1,0 +1,25 @@
+services:
+  server:
+    build: .
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    links:
+      - "mysql:mysql"
+  mysql:
+    image: mysql:8.0.22
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - /data/mysql_test:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin' ,'ping', '-h', 'localhost', '-u', 'root', '--password=$$MYSQL_ROOT_PASSWORD']
+      timeout: 3s
+      retries: 5
+      interval: 2s

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package ping;
+
+option go_package = 'easycoding/api/ping';
+
+import "google/api/annotations.proto";
+import "ping/ping.proto";
+
+// The ping service definition.
+service PingSvc {
+    rpc Ping(PingRequest) returns (PingResponse) {
+        option (google.api.http) = {
+            get: "/ping",
+        };
+    }
+}

@@ -3,19 +3,23 @@
         72,
         80
     ],
+    "editor.tabSize": 4,
     "files.watcherExclude": {
         "**/.git/": true,
-        "**/build/**": true,
+        "**/build/**": true
     },
-    "editor.tabSize": 4,
+    "go.lintFlags": [
+        "--fast"
+    ],
+    "go.lintTool": "golangci-lint",
     "go.useLanguageServer": true,
     "search.exclude": {
-        "build/**/*": true,
+        "build/**/*": true
     },
     "vim.easymotion": true,
     "vim.handleKeys": {
         "<C-a>": false,
         "<C-f>": false
     },
-    "vim.leader": ",",
+    "vim.leader": ","
 }
