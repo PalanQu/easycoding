@@ -3,7 +3,7 @@
 FROM golang:1.18-alpine
 
 # go cn proxy
-# ENV GOPROXY "https://goproxy.cn,direct"
+ENV GOPROXY "https://goproxy.cn,direct"
 
 WORKDIR /app
 
