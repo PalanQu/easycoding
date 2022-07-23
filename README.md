@@ -30,9 +30,9 @@ This project loosely follows [Uncle Bob's Clean Architecture](https://blog.clean
 
 ## Prerequest
 
-### 1. [protoc](https://github.com/protocolbuffers/protobuf#protocol-compiler-installation)
+### - [protoc](https://github.com/protocolbuffers/protobuf#protocol-compiler-installation)
 
-### 2. protoc plugins
+### - protoc plugins
 
 - go
 - grpc
@@ -49,20 +49,22 @@ go install \
     github.com/envoyproxy/protoc-gen-validate@latest
 ```
 
-### 3. [protobuf management](https://docs.buf.build/installation)
+### - golang 1.18+
 
-### 4. [go swagger cli](https://github.com/go-swagger/go-swagger/releases)
+### - [protobuf management](https://docs.buf.build/installation)
 
-### 5. docker and docker compose
+### - [go swagger cli](https://github.com/go-swagger/go-swagger/releases)
 
-### 6. (optional) pre-commit
+### - docker and docker compose
+
+### - (optional) pre-commit
 
 ``` bash
 pip3 install pre-commit
 pre-commit install
 ```
 
-### 7. (optional) golang lint
+### - (optional) golang lint
 
 ``` bash
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
