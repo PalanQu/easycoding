@@ -48,7 +48,7 @@ func newMigrateLogger() migrate.Logger {
 var _ migrate.Logger = (*migrateLogger)(nil)
 
 func (logger *migrateLogger) Printf(format string, v ...interface{}) {
-	logger.logger.Infof(format, v)
+	logger.logger.Infof(format, v...)
 }
 
 func (logger *migrateLogger) Verbose() bool {

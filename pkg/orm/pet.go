@@ -12,6 +12,7 @@ type Pet struct {
 	Name string
 	// TODO(qujiabao): replace int32 to pet_pb.PetType, because of `sqlize`
 	Type      int32
+	Age       int32
 	CreatedAt time.Time `gorm:"default:now()"`
 }
 

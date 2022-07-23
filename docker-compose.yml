@@ -17,9 +17,13 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=123456
     volumes:
-      - /data/mysql_test:/var/lib/mysql
+      - easycoding_mysql:/var/lib/mysql
     healthcheck:
       test: ['CMD', 'mysqladmin' ,'ping', '-h', 'localhost', '-u', 'root', '--password=$$MYSQL_ROOT_PASSWORD']
       timeout: 3s
       retries: 5
       interval: 2s
+
+volumes:
+  easycoding_mysql:
+    external: false

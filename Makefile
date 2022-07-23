@@ -36,7 +36,7 @@ build: gen-api
 run: gen-api
 	docker-compose up mysql -d
 	sleep 2
-	EASYCODING_DATABASE_HOST=localhost go run cmd/serve/main.go
+	go run cmd/serve/main.go
 
 .PHONY: stop
 stop:
