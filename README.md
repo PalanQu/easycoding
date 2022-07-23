@@ -128,6 +128,19 @@ Open the following url in the browser
 
 ### Topic1 Database migrate
 
+#### Motivation
+
+Write raw sql to operate database is not easy to maintain, we use ORM to
+interact with database, [Gorm](https://github.com/go-gorm/gorm) for this
+project. Another situation we encounter is that we often upgrade the structure
+of the database, firstly, in many compaines, people who write the code and
+deploy applications are different, so it is necessary to manage upgrade and
+downgrade properly, secondly we can intergrate sql files into intergration test
+to ensure the correctness of database structure, thirdly, it is hard to write
+up and down sql file manully.
+
+#### Get up
+
 For the current time, the database `test` is totally empty, use the following command to create auto migration sql files
 
 ``` bash
@@ -237,6 +250,20 @@ Version: 20220723144816, Dirty: false
 +------------+----------+------+-----+-------------------+-------------------+
 4 rows in set (0.00 sec)
 ```
+
+### Topic2 API management
+
+#### Motication
+
+In many cases, there are many files to describe one api
+
+- Some struct in golang/java files
+- Some class in typescript/javascript files
+- Readable document
+- so on
+
+That violate the [`Single source of truth`](https://en.wikipedia.org/wiki/Single_source_of_truth) principle, it is necessary to define
+the api in one place, and generate other files.
 
 ## TODO
 
