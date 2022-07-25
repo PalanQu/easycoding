@@ -1,5 +1,10 @@
 - config部分使用反射支持default值
 - 数据库migrate
+- 支持空文件migrate
+- 时间戳前面加一个版本号
+- 支持verify本地版本和数据库版本的对齐性
+- 支持当前数据库版本和migrations的diff
+- 支持将dirty转为false
 - benchmark
 - 增加protobuf breaking change检测
 - fix linter报的错误
