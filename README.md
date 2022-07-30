@@ -128,7 +128,7 @@ Open the following url in the browser
 
 ### Topic1 API management
 
-#### Motication
+#### Motivation
 
 In many cases, there are many files to describe one api
 
@@ -378,8 +378,8 @@ go run cmd/migrate/main.go step --latest
 ```
 
 ``` text
-INFO[0000] Start buffering 20220723144816/u pet         
-INFO[0000] Read and execute 20220723144816/u pet        
+INFO[0000] Start buffering 20220723144816/u pet
+INFO[0000] Read and execute 20220723144816/u pet
 INFO[0000] Finished 20220723144816/u pet (read 5.465976ms, ran 57.983119ms)
 ```
 
