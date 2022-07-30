@@ -126,7 +126,223 @@ Open the following url in the browser
 <img src="docs/pics/swagger.png" style="zoom:50%;" />
 <img src="docs/pics/metrics.png" style="zoom:50%;" />
 
-### Topic1 Database migrate
+### Topic1 API management
+
+#### Motication
+
+In many cases, there are many files to describe one api
+
+- Some struct/class in golang/java files
+- Some class in typescript/javascript files
+- Swagger/Openapi
+- Readable document
+
+That violate the [`Single source of truth`](https://en.wikipedia.org/wiki/Single_source_of_truth) principle, it is necessary to define
+the api in one place, and generate other files.
+
+#### Get started
+
+In this topic, we will add a new greet service
+
+api/greet_apis/greet/greet.proto
+
+``` protobuf
+syntax = "proto3";
+
+package greet;
+
+option go_package = 'easycoding/api/greet';
+
+message HelloRequest {
+    string req = 1;
+}
+
+message HelloResponse {
+    string res = 1;
+}
+```
+
+api/greet_apis/greet/greet.proto
+
+``` protobuf
+syntax = "proto3";
+
+package greet;
+
+option go_package = 'easycoding/api/greet';
+
+import "google/api/annotations.proto";
+import "greet/greet.proto";
+
+// The greet service definition.
+service GreetSvc {
+    rpc Hello(HelloRequest) returns (HelloResponse) {
+        option (google.api.http) = {
+            get: "/hello",
+        };
+    }
+}
+```
+
+api/greet_apis/buf.yaml
+
+``` yaml
+version: v1
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+```
+
+api/buf.work.yaml
+
+``` yaml
+   - payment_apis
+   - pet_apis
+   - ping_apis
+   # add new line
+   - greet_apis
+```
+
+Run `make gen-api` in the workspace, the following files will be generated
+
+``` text
+api/greet/greet.pb.go
+api/greet/greet.pb.validate.go
+api/greet/greet.swagger.json
+api/greet/rpc_grpc.pb.go
+api/greet/rpc.pb.go
+api/greet/rpc.pb.gw.go
+api/greet/rpc.pb.validate.go
+api/greet/rpc.swagger.json
+api/api.swagger.json
+```
+
+Implement the greet service
+
+internal/service/greet/service.go
+
+``` golang
+package greet
+
+import (
+	"context"
+	greet_pb "easycoding/api/greet"
+
+	"github.com/sirupsen/logrus"
+)
+
+type service struct{}
+
+var _ greet_pb.GreetSvcServer = (*service)(nil)
+
+func New(logger *logrus.Logger) *service {
+	return &service{}
+}
+
+func (s *service) Hello(
+	ctx context.Context,
+	req *greet_pb.HelloRequest,
+) (*greet_pb.HelloResponse, error) {
+	return &greet_pb.HelloResponse{Res: req.Req}, nil
+}
+```
+
+Update internal/service/register.go
+
+``` golang
+var endpointFuns = []RegisterHandlerFromEndpoint{
+	ping_pb.RegisterPingSvcHandlerFromEndpoint,
+	pet_pb.RegisterPetStoreSvcHandlerFromEndpoint,
+    // add new line
+	greet_pb.RegisterGreetSvcHandlerFromEndpoint,
+}
+
+func RegisterServers(grpcServer *grpc.Server, logger *logrus.Logger, db *gorm.DB) {
+	ping_pb.RegisterPingSvcServer(grpcServer, ping_svc.New(logger))
+	pet_pb.RegisterPetStoreSvcServer(grpcServer, pet_svc.New(logger, db))
+    // add new line
+	greet_pb.RegisterGreetSvcServer(grpcServer, greet_svc.New())
+}
+
+```
+
+Run the server
+
+``` bash
+make run
+```
+
+Check the rest http server
+
+``` bash
+curl localhost:10000/hello?req=hi
+```
+
+The new api document is in `http://localhost:10002/swagger/`, if you want to
+custom the output of openapi see
+[protoc-gen-openapi](https://grpc-ecosystem.github.io/grpc-gateway/docs/mapping/customizing_openapi_output/)
+for more information.
+
+``` proto
+message MyMessage {
+  // This comment will end up direcly in your Open API definition
+  string uuid = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The UUID field."}];
+}
+```
+
+The new metrics is in `http://localhost:10002/metrics`, you can use
+prometheus-client to custom metrics, see
+[go-grpc-prometheus](https://github.com/grpc-ecosystem/go-grpc-prometheus/blob/master/examples/grpc-server-with-prometheus/server/server.go#L39)
+for example.
+
+``` golang
+customizedCounterMetric = prometheus.NewCounterVec(prometheus.CounterOpts{
+    Name: "demo_server_say_hello_method_handle_count",
+    Help: "Total number of RPCs handled on the server.",
+}, []string{"name"})
+```
+
+You can add some validate to your api like following
+
+``` protobuf
+syntax = "proto3";
+
+package greet;
+
+option go_package = 'easycoding/api/greet';
+
+// add new line
+import "validate/validate.proto";
+
+message HelloRequest {
+    // add validate
+    string req = 1[(validate.rules).string = {min_len: 0, max_len: 10}];
+}
+
+message HelloResponse {
+    string res = 1;
+}
+```
+
+Stop the server and run `make gen-api` and `make run` again.
+
+Send the following request and will return error, see
+[protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate) for
+more validate rule.
+
+``` bash
+curl localhost:10000/hello?req=hiiiiiiiiii
+```
+
+Validator is checked request in the grpc middleware, you can find some common
+middlewares in
+[grpc-middleware](https://github.com/grpc-ecosystem/go-grpc-middleware), or you
+can custom your own middleware.
+
+### Topic2 Database migrate
 
 #### Motivation
 
@@ -139,7 +355,7 @@ downgrade properly, secondly we can intergrate sql files into intergration test
 to ensure the correctness of database structure, thirdly, it is hard to write
 up and down sql file manully.
 
-#### Get up
+#### Get started
 
 For the current time, the database `test` is totally empty, use the following command to create auto migration sql files
 
@@ -250,20 +466,6 @@ Version: 20220723144816, Dirty: false
 +------------+----------+------+-----+-------------------+-------------------+
 4 rows in set (0.00 sec)
 ```
-
-### Topic2 API management
-
-#### Motication
-
-In many cases, there are many files to describe one api
-
-- Some struct in golang/java files
-- Some class in typescript/javascript files
-- Readable document
-- so on
-
-That violate the [`Single source of truth`](https://en.wikipedia.org/wiki/Single_source_of_truth) principle, it is necessary to define
-the api in one place, and generate other files.
 
 ## TODO
 

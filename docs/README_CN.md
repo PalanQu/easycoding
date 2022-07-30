@@ -127,11 +127,238 @@ go run cmd/client/main.go
 <img src="pics/swagger.png" style="zoom:50%;" />
 <img src="pics/metrics.png" style="zoom:50%;" />
 
-### 专题1 数据库升级与降级
+### 专题1 接口管理
 
 #### 动机
 
+接口是一个抽象的概念，**与语言无关**，是用来描述两个服务沟通的方式，在真实世界中，有很多文件来描述同一个接口
+
+- golang、java中的struct或class
+- typescript、javascript中的class
+- swagger、openapi文档
+- word文档
+
+这么多地方都在描述同一个接口会出现以下场景
+
+1. 同一个概念例如【订单】，在前端需要描述一遍，在后端又需要描述一遍，前后端同学可能没有感觉，但是实际上工作量增加了
+2. 产品迭代很快，有可能沟通不及时，导致产品经理提了需求，跟后端的同学提了，但是没和前端提，结果后端改了接口，导致前端同学忽然接口就不能使用了，难免会怀疑自己写的哪里出错了，让前后端同学在写代码的时候没有什么是可以**相信**的，这就会让debug的周期加长，如果能够让每个模块自己闭环的完成任务，一定是迭代最快的方式
+3. 产品迭代很快，经常前后端需要通过文档来沟通接口，很多时候文档是不及时的，甚至是错误百出的，这也会让读文档的人陷入难题，看着文档做，如果出错了，那是我哪里做错了，还是文档写错了？如果都有可能，那就还要先诊断是谁的问题
+4. 文档本身经常使用word来承载，也不会放在代码仓库中，经常文档没有版本管理，如果checkout到一个分支，很难找到对应的文档
+
+这些情况违背了[`Single source of
+truth`](https://en.wikipedia.org/wiki/Single_source_of_truth)原则，所以接口必须要在一个地方描述，语言相关的接口文件和任何格式的文档都应该由描述生成出来。
+
+#### 开始
+
+在这个专题，我们会增加一个打招呼的接口
+
+api/greet_apis/greet/greet.proto
+
+``` protobuf
+syntax = "proto3";
+
+package greet;
+
+option go_package = 'easycoding/api/greet';
+
+message HelloRequest {
+    string req = 1;
+}
+
+message HelloResponse {
+    string res = 1;
+}
+```
+
+api/greet_apis/greet/greet.proto
+
+``` protobuf
+syntax = "proto3";
+
+package greet;
+
+option go_package = 'easycoding/api/greet';
+
+import "google/api/annotations.proto";
+import "greet/greet.proto";
+
+// The greet service definition.
+service GreetSvc {
+    rpc Hello(HelloRequest) returns (HelloResponse) {
+        option (google.api.http) = {
+            get: "/hello",
+        };
+    }
+}
+```
+
+api/greet_apis/buf.yaml
+
+``` yaml
+version: v1
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+```
+
+api/buf.work.yaml
+
+``` yaml
+   - payment_apis
+   - pet_apis
+   - ping_apis
+   # add new line
+   - greet_apis
+```
+
+在项目根目录运行`make gen-api`，会生成以下文件
+
+``` text
+api/greet/greet.pb.go
+api/greet/greet.pb.validate.go
+api/greet/greet.swagger.json
+api/greet/rpc_grpc.pb.go
+api/greet/rpc.pb.go
+api/greet/rpc.pb.gw.go
+api/greet/rpc.pb.validate.go
+api/greet/rpc.swagger.json
+api/api.swagger.json
+```
+
+实现打招呼接口
+
+internal/service/greet/service.go
+
+``` golang
+package greet
+
+import (
+	"context"
+	greet_pb "easycoding/api/greet"
+
+	"github.com/sirupsen/logrus"
+)
+
+type service struct{}
+
+var _ greet_pb.GreetSvcServer = (*service)(nil)
+
+func New(logger *logrus.Logger) *service {
+	return &service{}
+}
+
+func (s *service) Hello(
+	ctx context.Context,
+	req *greet_pb.HelloRequest,
+) (*greet_pb.HelloResponse, error) {
+	return &greet_pb.HelloResponse{Res: req.Req}, nil
+}
+```
+
+更新internal/service/register.go
+
+``` golang
+var endpointFuns = []RegisterHandlerFromEndpoint{
+	ping_pb.RegisterPingSvcHandlerFromEndpoint,
+	pet_pb.RegisterPetStoreSvcHandlerFromEndpoint,
+    // add new line
+	greet_pb.RegisterGreetSvcHandlerFromEndpoint,
+}
+
+func RegisterServers(grpcServer *grpc.Server, logger *logrus.Logger, db *gorm.DB) {
+	ping_pb.RegisterPingSvcServer(grpcServer, ping_svc.New(logger))
+	pet_pb.RegisterPetStoreSvcServer(grpcServer, pet_svc.New(logger, db))
+    // add new line
+	greet_pb.RegisterGreetSvcServer(grpcServer, greet_svc.New())
+}
+
+```
+
+启动服务
+
+``` bash
+make run
+```
+
+查看rest服务
+
+``` bash
+curl localhost:10000/hello?req=hi
+```
+
+最新的文档会生成在`http://localhost:10002/swagger/`, 如果你想自定义文档输出的内容，可以看
+[protoc-gen-openapi](https://grpc-ecosystem.github.io/grpc-gateway/docs/mapping/customizing_openapi_output/)
+
+``` proto
+message MyMessage {
+  // This comment will end up direcly in your Open API definition
+  string uuid = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "The UUID field."}];
+}
+```
+
+最新的指标数据放在`http://localhost:10002/metrics`, 可以使用`prometheus-client`来自定义指标，可以看
+[go-grpc-prometheus](https://github.com/grpc-ecosystem/go-grpc-prometheus/blob/master/examples/grpc-server-with-prometheus/server/server.go#L39)中的例子
+
+``` golang
+customizedCounterMetric = prometheus.NewCounterVec(prometheus.CounterOpts{
+    Name: "demo_server_say_hello_method_handle_count",
+    Help: "Total number of RPCs handled on the server.",
+}, []string{"name"})
+```
+
+可以给接口增加一些检查器
+
+``` protobuf
+syntax = "proto3";
+
+package greet;
+
+option go_package = 'easycoding/api/greet';
+
+// add new line
+import "validate/validate.proto";
+
+message HelloRequest {
+    // add validate
+    string req = 1[(validate.rules).string = {min_len: 0, max_len: 10}];
+}
+
+message HelloResponse {
+    string res = 1;
+}
+```
+
+停止服务，并且重新跑`make gen-api` 和 `make run`
+
+发送以下请求会收到一个错误，如果想要更多的检查器可以查看
+[protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate).
+
+``` bash
+curl localhost:10000/hello?req=hiiiiiiiiii
+```
+
+检查器是在grpc的拦截器中被检查触发的，如果检查失败会直接返回，更多在拦截器可以查看
+[grpc-middleware](https://github.com/grpc-ecosystem/go-grpc-middleware),
+也可以很容易的定义自己的检查器.
+
+### 专题2 数据库升级与降级
+
+#### 动机
+
+在真实世界中，可能会出现以下场景
+
+1. 写代码的人每次给出一个当前版本全量的sql文件，部署的人不知道当前版本和上个版本的变化，不能确认执行哪些sql
+2. 写代码的人每次升级都会给出需要执行的sql文件，但是部署的人可能忘记执行或者多执行了一些sql语句，无法知道每次升级到底执行了哪些语句，没有执行哪些语句
+3. 升级可能连续升级多个版本，降级多个版本，如果sql文件没有从程序化的当时和版本对应上，升级降级都要人工操作就会比较慢，还容易出错
+4. 数据库的权限控制的不好，有可能有其他人因为一些原因，到数据库中执行了一些sql脚本，但是没有告诉其他人，其他人在升级过程中出错，没有办法判断是谁的错
+5. 因为某些原因使得生产环境版本回滚，数据库也应该回滚，很多写代码的人只会写升级sql文件，不会写降级的sql文件，使得没有办法干净的回滚
+
 在代码中写sql来对数据库进行操作是很难维护的，通常是使用ORM作为中间层来进行交互，本项目使用[Gorm](https://github.com/go-gorm/gorm)，另一个问题是随着业务的迭代，我们经常会更新数据库结构，这是必然的，但是在很多公司，写代码和部署代码不是同一个人，部署代码的人只能僵硬的去执行写代码的人给的sql升级文件，如果一旦出现错误，无法判断如何解决，而且经常业务会有升级和回滚，一方面代码本身要使用【双写】等等的机制来保证数据表的向前兼容，但是表结构本身也要支持版本管理，那就必然需要回滚。另一方面，我们如果有了升级的文件就可以比较容易的结合CI、CD流程集成测试，自动升级。最后一个问题是我们手动的写升级和降级的sql文件是非常困难的，也比较难以维护，所以尽量可以做到自动生成。
+
+#### 开始
 
 现在 `test` 数据库完全是空的，使用以下命令来创建数据库初始化sql文件
 
@@ -240,20 +467,6 @@ Version: 20220723144816, Dirty: false
 +------------+----------+------+-----+-------------------+-------------------+
 4 rows in set (0.00 sec)
 ```
-
-### 专题2 接口管理
-
-#### 动机
-
-接口是一个抽象的概念，是用来描述两个服务沟通的方式，在真实世界中，有很多文件来描述同一个接口
-
-- golang、java中的struct或class
-- typescript、javascript中的class
-- 人可以读的文档
-- 等等
-
-这个情况违背了[`Single source of
-truth`](https://en.wikipedia.org/wiki/Single_source_of_truth)原则，所以接口必须要在一个地方定义，多个地方生成。
 
 ## TODO
 
