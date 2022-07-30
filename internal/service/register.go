@@ -20,6 +20,17 @@ const (
 	maxMsgSize = 500 * 1024 * 1024
 )
 
+type RegisterHandlerFromEndpoint func(
+	ctx context.Context,
+	gwmux *runtime.ServeMux,
+	endpoint string,
+	opts []grpc.DialOption) (err error)
+
+var endpointFuncs = []RegisterHandlerFromEndpoint{
+	ping_pb.RegisterPingSvcHandlerFromEndpoint,
+	pet_pb.RegisterPetStoreSvcHandlerFromEndpoint,
+}
+
 // RegisterServers register grpc services.
 func RegisterServers(grpcServer *grpc.Server, logger *logrus.Logger, db *gorm.DB) {
 	ping_pb.RegisterPingSvcServer(grpcServer, ping_svc.New(logger))
@@ -36,18 +47,7 @@ func RegisterHandlers(gwmux *runtime.ServeMux, grpcAddr string) {
 			grpc.MaxCallSendMsgSize(maxMsgSize),
 		),
 	}
-	type RegisterHandlerFromEndpoint func(
-		ctx context.Context,
-		gwmux *runtime.ServeMux,
-		endpoint string,
-		opts []grpc.DialOption) (err error)
-
-	funcs := []RegisterHandlerFromEndpoint{
-		ping_pb.RegisterPingSvcHandlerFromEndpoint,
-		pet_pb.RegisterPetStoreSvcHandlerFromEndpoint,
-	}
-
-	for _, f := range funcs {
+	for _, f := range endpointFuncs {
 		f(ctx, gwmux, grpcAddr, dopts)
 	}
 }
