@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: easycoding-server-config
+    labels:
+        app: easycoding-server
+data:
+    config.yaml: |
+      database:
+          db_name: test
+          host: {{ .Values.mysql.primary.service.name }}
+          password: {{ .Values.mysql.auth.rootPassword | quote }}
+          port: {{ .Values.mysql.primary.service.ports.mysql | quote }}
+          user: {{ .Values.mysql.auth.user }}
+      log:
+          dir: {{ .Values.server.log_dir }}
+          level: {{ .Values.server.log_level }}
+      server:
+          gateway_port: {{ .Values.server.rest_port | quote }}
+          grpc_port: {{ .Values.server.grpc_port | quote }}
+          restart_on_error: {{ .Values.server.restart_on_error }}
+          swagger_port: {{ .Values.server.swagger_port | quote }}
