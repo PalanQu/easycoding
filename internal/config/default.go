@@ -7,11 +7,12 @@ var defaultConfig = Config{
 		SwaggerPort: "10002",
 	},
 	Database: DatabaseConfig{
-		Host:     "localhost",
-		Port:     "3306",
-		User:     "root",
-		Password: "123456",
-		DBName:   "test",
+		Host:           "localhost",
+		Port:           "3306",
+		User:           "root",
+		Password:       "123456",
+		DBName:         "test",
+		CreateDatabase: true,
 	},
 	Log: LogConfig{
 		Level: "INFO",

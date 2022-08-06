@@ -52,7 +52,7 @@ const (
 	prometheusPrefix = "/metrics"
 	swaggerPrefix    = "/swagger/"
 
-	// TODO: set in config?
+	// TODO(qujiabao): refactor these hard code values into config
 	serveHost          = "0.0.0.0"
 	maxMsgSize         = 5 * 1024 * 1024
 	clientMinWaitPing  = 5 * time.Second

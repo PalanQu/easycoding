@@ -78,18 +78,6 @@ make deps
 make run
 ```
 
-**注意: 第一次运行需要手动创建 `test` 数据库，否则会出现以下错误**
-
-``` text
-failed to initialize database, got error [driver: bad connection]
-```
-
-``` bash
-docker exec -it easycoding-mysql-1 bash
-mysql -u root -p123456
-create database test;
-```
-
 执行后会生成以下文件
 
 - api/{module_name}/{module_name}.pb.go
@@ -380,8 +368,8 @@ go run cmd/migrate/main.go step --latest
 ```
 
 ``` text
-INFO[0000] Start buffering 20220723144816/u pet         
-INFO[0000] Read and execute 20220723144816/u pet        
+INFO[0000] Start buffering 20220723144816/u pet
+INFO[0000] Read and execute 20220723144816/u pet
 INFO[0000] Finished 20220723144816/u pet (read 5.465976ms, ran 57.983119ms)
 ```
 

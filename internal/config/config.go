@@ -27,11 +27,12 @@ func LoadConfig(configPath string) *Config {
 			RestartOnError: viper.GetBool("server.restart_on_error"),
 		},
 		Database: DatabaseConfig{
-			Host:     viper.GetString("database.host"),
-			Port:     viper.GetString("database.port"),
-			User:     viper.GetString("database.user"),
-			Password: viper.GetString("database.password"),
-			DBName:   viper.GetString("database.db_name"),
+			Host:           viper.GetString("database.host"),
+			Port:           viper.GetString("database.port"),
+			User:           viper.GetString("database.user"),
+			Password:       viper.GetString("database.password"),
+			DBName:         viper.GetString("database.db_name"),
+			CreateDatabase: viper.GetBool("database.create_database"),
 		},
 		Log: LogConfig{
 			Level: viper.GetString("log.level"),
@@ -69,6 +70,7 @@ func SetDefaults() {
 	viper.SetDefault("database.user", defaultConfig.Database.User)
 	viper.SetDefault("database.password", defaultConfig.Database.Password)
 	viper.SetDefault("database.db_name", defaultConfig.Database.DBName)
+	viper.SetDefault("database.create_database", defaultConfig.Database.CreateDatabase)
 
 	viper.SetDefault("log.level", defaultConfig.Log.Level)
 	viper.SetDefault("log.dir", defaultConfig.Log.Dir)

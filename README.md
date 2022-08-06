@@ -77,18 +77,6 @@ make deps
 make run
 ```
 
-**NOTE: The first time you MUST create database `test` manully or you will recevice following error**
-
-``` text
-failed to initialize database, got error [driver: bad connection]
-```
-
-``` bash
-docker exec -it easycoding-mysql-1 bash
-mysql -u root -p123456
-create database test;
-```
-
 The following files will be generated
 
 - api/{module_name}/{module_name}.pb.go
