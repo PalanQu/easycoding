@@ -6,3 +6,6 @@
 
 # coverage file
 coverage.out
+
+# tgz
+*.tgz
