@@ -477,6 +477,7 @@ Version: 20220723144816, Dirty: false
 - More options in configuration
 - Property based test
 - GraphQL server
+- Use go generate to refactor proto and bindata generation
 
 ## Inspirations
 
