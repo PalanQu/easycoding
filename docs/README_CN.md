@@ -158,7 +158,7 @@ message HelloResponse {
 }
 ```
 
-api/greet_apis/greet/greet.proto
+api/greet_apis/greet/rpc.proto
 
 ``` protobuf
 syntax = "proto3";
