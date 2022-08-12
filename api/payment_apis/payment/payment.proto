@@ -4,8 +4,6 @@ package payment;
 
 option go_package = 'easycoding/api/payment';
 
-import "google/type/money.proto";
-
 // PaymentProvider represents the supported set
 // of payment providers.
 enum PaymentProvider {
@@ -19,6 +17,5 @@ enum PaymentProvider {
 message Order {
   string order_id = 1;
   string recipient_id = 2;
-  google.type.Money amount = 3;
   PaymentProvider payment_provider = 4;
 }

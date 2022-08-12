@@ -44,6 +44,9 @@ var genGoCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		if len(delDirNames) == 0 {
+			return nil
+		}
 		rmCommands := []string{"rm", "-r"}
 		rmCommands = append(rmCommands, delDirNames...)
 

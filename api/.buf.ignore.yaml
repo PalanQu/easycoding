@@ -5,5 +5,5 @@
 #   https://github.com/bufbuild/buf/issues/188
 
 ignore_modules:
-  - google
-  - validate
+  # - google
+  # - validate

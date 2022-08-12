@@ -13,3 +13,5 @@ coverage.out
 # python protobuf files
 *_pb2.py
 *_grpc.py
+*_pb2.pyi
+*.pyc
