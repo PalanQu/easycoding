@@ -19,6 +19,7 @@
 - 自动生成grpc，grpc-gateway，validate文件
 - 每个接口同时提供rest和grpc访问接口
 - 自动生成swagger ui文档
+- 接口兼容性检测
 - 内置基础的prometheus指标
 - 支持将接口导入到postman中进行调试
 - 在docker中运行
