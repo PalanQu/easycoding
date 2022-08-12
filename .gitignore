@@ -1,4 +1,4 @@
-# Go related files.
+# go related files.
 *.pb.go
 *.pb.gw.go
 *.pb.validate.go
@@ -9,3 +9,6 @@ coverage.out
 
 # tgz
 *.tgz
+
+# python protobuf files
+*_pb2.py
