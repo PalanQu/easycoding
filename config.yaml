@@ -1,7 +1,7 @@
 database:
     db_name: test
     host: localhost
-    password: "123456"
+    password: root
     port: "3306"
     user: root
     create_database: true

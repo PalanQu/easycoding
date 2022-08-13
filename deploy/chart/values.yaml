@@ -1,13 +1,14 @@
 ---
 server:
-  image: easycoding:v0.0.1
-  service_name: server-svc
+  image: registry.cn-hongkong.aliyuncs.com/palanqu/easycoding:v0.0.2
+  service_name: easycoding-server
   rest_port: 10000
   grpc_port: 10001
   swagger_port: 10002
   restart_on_error: false
   log_dir: ""
   log_level: INFO
+  service_monitor: true
 
 # values for https://artifacthub.io/packages/helm/bitnami/mysql
 mysql:
