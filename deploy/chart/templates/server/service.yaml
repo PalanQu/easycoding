@@ -3,6 +3,9 @@ apiVersion: v1
 kind: Service
 metadata:
     name: {{ .Values.server.service_name }}
+    labels:
+      app: easycoding-server
+      app_type: grpc-go
 spec:
     type: ClusterIP
     ports:

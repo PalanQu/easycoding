@@ -1,0 +1,20 @@
+# https://grafana.com/grafana/dashboards/9186
+# https://grafana.com/grafana/dashboards/14765
+{{ if .Values.server.service_monitor }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: easycoding-server
+spec:
+  endpoints:
+  - interval: 30s
+    port: swagger-port
+  namespaceSelector:
+    matchNames:
+    - easycoding
+  selector:
+    matchLabels:
+      app: easycoding-server
+  jobLabel: app_type
+{{ end }}
