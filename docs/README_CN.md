@@ -333,6 +333,55 @@ curl localhost:10000/hello?req=hiiiiiiiiii
 [grpc-middleware](https://github.com/grpc-ecosystem/go-grpc-middleware),
 也可以很容易的定义自己的检查器.
 
+#### 兼容性检测
+
+``` bash
+cd api/pet_apis
+buf breaking   --against "../../.git#branch=master,subdir=api/pet_apis"
+```
+
+不兼容的更改
+
+``` proto
+// api/pet_apis/pet/pet.proto
+message Pet {
+    int32 pet_id = 1;
+    string name = 2;
+    // change the following type
+    // PetType pet_type = 3;
+    string pet_type = 3;
+}
+```
+
+检测兼容性
+
+``` bash
+cd api/pet_apis
+buf breaking   --against "../../.git#branch=master,subdir=api/pet_apis"
+```
+
+``` text
+pet/pet.proto:22:5:Field "3" on message "Pet" changed type from "enum" to "string".
+```
+
+兼容性更改
+
+``` proto
+// api/pet_apis/pet/pet.proto
+message Pet {
+    int32 pet_id = 1;
+    string name = 2;
+    PetType pet_type = 3;
+    // add the following field
+    string address = 4;
+}
+```
+
+``` bash
+cd api/pet_apis
+buf breaking   --against "../../.git#branch=master,subdir=api/pet_apis"
+```
+
 ### 专题2 数据库升级与降级
 
 #### 动机
@@ -459,11 +508,274 @@ Version: 20220723144816, Dirty: false
 
 ### Topic3 静态检测
 
+#### 动机
+
+- 使用同一个【语言】合作
+- 尽早发现bug
+- 用代码定义代码规范
+- 教人写代码
+
+<table>
+<thead><tr><th>Bad</th> <th>Good</th></tr></thead>
+<tbody>
+<tr>
+<td>
+
+```go
+func (d *Driver) SetTrips(trips []Trip) {
+  d.trips = trips
+}
+
+trips := ...
+d1.SetTrips(trips)
+
+// Did you mean to modify d1.trips?
+trips[0] = ...
+```
+
+</td>
+<td>
+
+```go
+func (d *Driver) SetTrips(trips []Trip) {
+  d.trips = make([]Trip, len(trips))
+  copy(d.trips, trips)
+}
+
+trips := ...
+d1.SetTrips(trips)
+
+// We can now modify trips[0] without affecting d1.trips.
+trips[0] = ...
+```
+
+</td>
+</tr>
+
+</tbody>
+</table>
+
+Alignment
+
+<table>
+<thead><tr><th>Bad</th> <th>Good</th></tr></thead>
+<tbody>
+<tr>
+<td>
+
+```go
+// 12 bytes
+type Foo struct {
+	aaa bool
+	bbb int32
+	ссс bool
+}
+```
+
+</td>
+<td>
+
+```go
+// 8 bytes
+type Foo struct {
+	aaa bool
+	ссс bool
+	bbb int32
+}
+```
+
+</td>
+</tr>
+
+</tbody>
+</table>
+
+更多请看[Uber golang style guide](https://github.com/xxjwxc/uber_go_guide_cn)
+
 ### Topic4 错误处理
+
+#### 概念
+
+错误 vs 异常
+
+错误是程序中可能出现的问题，是业务的一部分，例如数据库连接失败
+异常是预期之外的问题，不是业务的一部分，例如空指针异常，数组越界
+
+#### 错误处理范式（之一）
+
+``` text
+            ┌───────────────┐
+            │               │
+            │  handle error │
+            │               │
+            └───────────────┘
+                    ▲
+                    │
+            ┌───────┴───────┐
+            │               │
+            │  with message │
+            │               │
+            └───────────────┘
+                    ▲
+                    │
+            ┌───────┴───────┐
+            │               │
+            │   wrap error  │
+            │               │
+            └───────────────┘
+                    ▲
+                    │
+            ┌───────┴───────┐
+            │               │
+            │   raw  error  │
+            │               │
+            └───────────────┘
+```
+
+#### Example
+
+``` golang
+// pkg/orm/pet.go
+func (pet *Pet) GetPet(db *gorm.DB, id int32) error {
+    // err is a raw err from gorm
+	if err := db.Take(pet, "id = ?", id).Error; err != nil {
+        // check the type of raw error
+		if errors.ErrorIs(err, gorm.ErrRecordNotFound) {
+            // wrap error
+			return errors.ErrNotFound(err)
+		}
+        // wrap error
+		return errors.ErrInternal(err)
+	}
+	return nil
+}
+```
+
+``` golang
+// internal/service/pet/get_pet.go
+func (s *service) getPet(
+	ctx context.Context,
+	req *pet_pb.GetPetRequest,
+) (*pet_pb.GetPetResponse, error) {
+	pet := &orm.Pet{}
+	if err := pet.GetPet(s.DB, req.PetId); err != nil {
+        // with message in service
+		return nil, errors.WithMessage(err, "get pet failed")
+	}
+}
+```
+
+``` golang
+// internal/middleware/log/interceptor.go
+
+// Describe how to log error
+func Interceptor(logger *logrus.Logger) func(
+	ctx context.Context,
+	req interface{},
+	_ *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler) (interface{}, error) {
+	ops := []grpc_logrus.Option{
+        // map to log level
+		grpc_logrus.WithLevels(levelFunc),
+        // add decider
+		grpc_logrus.WithDecider(decider),
+	}
+	entry := logrus.NewEntry(logger)
+
+	logInterceptorBefore := createBeforeInterceptor(entry)
+	logInterceptorAfter := createAfterInterceptor(entry)
+
+	return grpc_middleware.ChainUnaryServer(
+		logInterceptorBefore,
+		grpc_logrus.UnaryServerInterceptor(entry, ops...),
+		logInterceptorAfter,
+	)
+}
+```
+
+``` golang
+// internal/middleware/error/interceptor.go
+
+// error classification
+func Interceptor(logger *logrus.Logger) grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		req interface{},
+		reqinfo *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
+		res, err := handler(ctx, req)
+		if err == nil {
+			return res, err
+		}
+		var code codes.Code
+
+		switch {
+		case errors.ErrorIs(err, errors.InternalError):
+			code = codes.Internal
+		case errors.ErrorIs(err, errors.InvalidError):
+			code = codes.InvalidArgument
+		case errors.ErrorIs(err, errors.NotFoundError):
+			code = codes.NotFound
+		case errors.ErrorIs(err, errors.PermissionError):
+			code = codes.PermissionDenied
+		case errors.ErrorIs(err, errors.UnauthorizedError):
+			code = codes.Unauthenticated
+		default:
+			logger.WithError(err).WithField("method", reqinfo.FullMethod).
+				Warn("invalid err, without using easycoding/pkg/errors")
+			return res, err
+		}
+		s := status.New(code, err.Error())
+		return res, s.Err()
+	}
+}
+```
 
 ### Topic5 配置管理
 
+#### 动机
+
+配置是一个抽象的概念，与语言无关，经常会用有如下文件来描述配置
+
+- yaml file
+- json
+- golang struct
+
+这些情况违背了[`Single source of
+truth`](https://en.wikipedia.org/wiki/Single_source_of_truth)原则，所以配置必须要在一个地方描述，其他任何格式的配置都应该生成出来。
+
+配置应该由多个源头组合而成，然后绑定到golang struct中
+
+- explicit call `Set`
+- command line flag
+- env
+- file
+- default
+
 ### Topic6 单元测试和覆盖率
+
+#### 开始
+
+运行所有单元测试
+
+``` bash
+make test
+```
+
+运行所有单元测试，并输出每个模块的测试覆盖率
+
+``` bash
+make coverage
+```
+
+运行所有单元测试，并输出每个模块的测试覆盖率，并将报告输出到浏览器中
+
+``` bash
+make coverage-html
+```
+
+<img src="docs/pics/coverage.png" style="zoom:50%;" />
 
 ### Topic7 交付和部署
 

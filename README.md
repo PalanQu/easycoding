@@ -119,15 +119,16 @@ Open the following url in the browser
 
 #### Motivation
 
-In many cases, there are many files to describe one api
+Api is an abstract concept, is language independent, in many cases, there are
+many files to describe an api
 
 - Some struct/class in golang/java files
 - Some class in typescript/javascript files
 - Swagger/Openapi
 - Readable document
 
-That violate the [`Single source of truth`](https://en.wikipedia.org/wiki/Single_source_of_truth) principle, it is necessary to define
-the api in one place, and generate other files.
+That violate the [`Single source of truth`](https://en.wikipedia.org/wiki/Single_source_of_truth)
+principle, it should define the api in one place, and generate other files.
 
 #### Get started
 
@@ -331,6 +332,55 @@ middlewares in
 [grpc-middleware](https://github.com/grpc-ecosystem/go-grpc-middleware), or you
 can custom your own middleware.
 
+#### Breaking change detection
+
+``` bash
+cd api/pet_apis
+buf breaking   --against "../../.git#branch=master,subdir=api/pet_apis"
+```
+
+Incompatible changes
+
+``` proto
+// api/pet_apis/pet/pet.proto
+message Pet {
+    int32 pet_id = 1;
+    string name = 2;
+    // change the following type
+    // PetType pet_type = 3;
+    string pet_type = 3;
+}
+```
+
+Check the compatibility
+
+``` bash
+cd api/pet_apis
+buf breaking   --against "../../.git#branch=master,subdir=api/pet_apis"
+```
+
+``` text
+pet/pet.proto:22:5:Field "3" on message "Pet" changed type from "enum" to "string".
+```
+
+Compatible changes
+
+``` proto
+// api/pet_apis/pet/pet.proto
+message Pet {
+    int32 pet_id = 1;
+    string name = 2;
+    PetType pet_type = 3;
+    // add the following field
+    string address = 4;
+}
+```
+
+``` bash
+cd api/pet_apis
+buf breaking   --against "../../.git#branch=master,subdir=api/pet_apis"
+```
+
 ### Topic2 Database migrate
 
 #### Motivation
@@ -346,13 +396,15 @@ up and down sql file manully.
 
 #### Get started
 
-For the current time, the database `test` is totally empty, use the following command to create auto migration sql files
+For the current time, the database `test` is totally empty, use the following
+command to create auto migration sql files
 
 ``` bash
 make migrate-create
 ```
 
-The following files will be generated, see [migrate](https://github.com/golang-migrate/migrate) for more information
+The following files will be generated, see
+[migrate](https://github.com/golang-migrate/migrate) for more information
 
 ``` text
 migrations/pet/{timestamp}_pet.up.sql
@@ -360,7 +412,8 @@ migrations/pet/{timestamp}_pet.down.sql
 ```
 
 Migrate sql to database, in the cloud native scenario, you usually need to start
-a [kubernetes job](https://kubernetes.io/docs/concepts/workloads/controllers/job/) to migrate the database, so the command is not intergrate with Makefile.
+a [kubernetes job](https://kubernetes.io/docs/concepts/workloads/controllers/job/)
+to migrate the database, so the command is not intergrate with Makefile.
 
 ``` bash
 go run cmd/migrate/main.go step --latest
@@ -458,11 +511,285 @@ Version: 20220723144816, Dirty: false
 
 ### Topic3 Linter
 
+#### Motivation
+
+- Cooperate in a same pattern
+- Finds bugs during early stages of development
+- Coding style as code
+- Define rules to assist developers
+
+<table>
+<thead><tr><th>Bad</th> <th>Good</th></tr></thead>
+<tbody>
+<tr>
+<td>
+
+```go
+func (d *Driver) SetTrips(trips []Trip) {
+  d.trips = trips
+}
+
+trips := ...
+d1.SetTrips(trips)
+
+// Did you mean to modify d1.trips?
+trips[0] = ...
+```
+
+</td>
+<td>
+
+```go
+func (d *Driver) SetTrips(trips []Trip) {
+  d.trips = make([]Trip, len(trips))
+  copy(d.trips, trips)
+}
+
+trips := ...
+d1.SetTrips(trips)
+
+// We can now modify trips[0] without affecting d1.trips.
+trips[0] = ...
+```
+
+</td>
+</tr>
+
+</tbody>
+</table>
+
+Alignment
+
+<table>
+<thead><tr><th>Bad</th> <th>Good</th></tr></thead>
+<tbody>
+<tr>
+<td>
+
+```go
+// 12 bytes
+type Foo struct {
+	aaa bool
+	bbb int32
+	ссс bool
+}
+```
+
+</td>
+<td>
+
+```go
+// 8 bytes
+type Foo struct {
+	aaa bool
+	ссс bool
+	bbb int32
+}
+```
+
+</td>
+</tr>
+
+</tbody>
+</table>
+
+
+For more information see [Uber golang style guide](https://github.com/uber-go/guide/blob/master/style.md)
+
+#### Get started
+
+``` bash
+make lint
+```
+
 ### Topic4 Error handling
+
+#### Concept
+
+Error vs Exception
+
+Errors are the possible problems in program, is part of bussiness, like database
+connection failed.
+
+Exception is unexpectable problems in program, is not part of bussiness, like
+nil pointer exception, array outof range.
+
+#### Guideline
+
+``` text
+            ┌───────────────┐
+            │               │
+            │  handle error │
+            │               │
+            └───────────────┘
+                    ▲
+                    │
+            ┌───────┴───────┐
+            │               │
+            │  with message │
+            │               │
+            └───────────────┘
+                    ▲
+                    │
+            ┌───────┴───────┐
+            │               │
+            │   wrap error  │
+            │               │
+            └───────────────┘
+                    ▲
+                    │
+            ┌───────┴───────┐
+            │               │
+            │   raw  error  │
+            │               │
+            └───────────────┘
+```
+
+#### Example
+
+``` golang
+// pkg/orm/pet.go
+func (pet *Pet) GetPet(db *gorm.DB, id int32) error {
+    // err is a raw err from gorm
+	if err := db.Take(pet, "id = ?", id).Error; err != nil {
+        // check the type of raw error
+		if errors.ErrorIs(err, gorm.ErrRecordNotFound) {
+            // wrap error
+			return errors.ErrNotFound(err)
+		}
+        // wrap error
+		return errors.ErrInternal(err)
+	}
+	return nil
+}
+```
+
+``` golang
+// internal/service/pet/get_pet.go
+func (s *service) getPet(
+	ctx context.Context,
+	req *pet_pb.GetPetRequest,
+) (*pet_pb.GetPetResponse, error) {
+	pet := &orm.Pet{}
+	if err := pet.GetPet(s.DB, req.PetId); err != nil {
+        // with message in service
+		return nil, errors.WithMessage(err, "get pet failed")
+	}
+}
+```
+
+``` golang
+// internal/middleware/log/interceptor.go
+
+// Describe how to log error
+func Interceptor(logger *logrus.Logger) func(
+	ctx context.Context,
+	req interface{},
+	_ *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler) (interface{}, error) {
+	ops := []grpc_logrus.Option{
+        // map to log level
+		grpc_logrus.WithLevels(levelFunc),
+        // add decider
+		grpc_logrus.WithDecider(decider),
+	}
+	entry := logrus.NewEntry(logger)
+
+	logInterceptorBefore := createBeforeInterceptor(entry)
+	logInterceptorAfter := createAfterInterceptor(entry)
+
+	return grpc_middleware.ChainUnaryServer(
+		logInterceptorBefore,
+		grpc_logrus.UnaryServerInterceptor(entry, ops...),
+		logInterceptorAfter,
+	)
+}
+```
+
+``` golang
+// internal/middleware/error/interceptor.go
+
+// error classification
+func Interceptor(logger *logrus.Logger) grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		req interface{},
+		reqinfo *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
+		res, err := handler(ctx, req)
+		if err == nil {
+			return res, err
+		}
+		var code codes.Code
+
+		switch {
+		case errors.ErrorIs(err, errors.InternalError):
+			code = codes.Internal
+		case errors.ErrorIs(err, errors.InvalidError):
+			code = codes.InvalidArgument
+		case errors.ErrorIs(err, errors.NotFoundError):
+			code = codes.NotFound
+		case errors.ErrorIs(err, errors.PermissionError):
+			code = codes.PermissionDenied
+		case errors.ErrorIs(err, errors.UnauthorizedError):
+			code = codes.Unauthenticated
+		default:
+			logger.WithError(err).WithField("method", reqinfo.FullMethod).
+				Warn("invalid err, without using easycoding/pkg/errors")
+			return res, err
+		}
+		s := status.New(code, err.Error())
+		return res, s.Err()
+	}
+}
+```
 
 ### Topic5 Configuration
 
+#### Motivation
+
+Configuration is an abstract concept, language independent, in many cases, we
+describe configuration is many files
+
+- yaml file
+- json
+- golang struct
+
+That violate the [`Single source of truth`](https://en.wikipedia.org/wiki/Single_source_of_truth)
+principle, it should define the api in one place, and generate other files.
+
+Configuration should combine the following sources and bind to struct
+
+- explicit call `Set`
+- command line flag
+- env
+- file
+- default
+
 ### Topic6 Unit test and coverage
+
+#### Get started
+
+Run all tests
+
+``` bash
+make test
+```
+
+Run all tests with coverage
+
+``` bash
+make coverage
+```
+
+Run all tests with coverage and open the report in browser
+
+``` bash
+make coverage-html
+```
+
+<img src="docs/pics/coverage.png" style="zoom:50%;" />
 
 ### Topic7 Release and deploy
 
