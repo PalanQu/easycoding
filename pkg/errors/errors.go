@@ -113,6 +113,14 @@ func ErrorIs(err error, target error) bool {
 	return pkgerrors.Is(err, target)
 }
 
+func WithMessage(err error, message string) error {
+	return pkgerrors.WithMessage(err, message)
+}
+
+func WithMessagef(err error, format string, args ...interface{}) error {
+	return pkgerrors.WithMessagef(err, format, args...)
+}
+
 func wrapErr(wrapedErr error, err error) error {
 	if err == nil {
 		return pkgerrors.Wrap(wrapedErr, "")

@@ -3,6 +3,7 @@ package pet
 import (
 	"context"
 	pet_pb "easycoding/api/pet"
+	"easycoding/pkg/errors"
 	"easycoding/pkg/orm"
 )
 
@@ -12,7 +13,7 @@ func (s *service) getPet(
 ) (*pet_pb.GetPetResponse, error) {
 	pet := &orm.Pet{}
 	if err := pet.GetPet(s.DB, req.PetId); err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "get pet failed")
 	}
 
 	return &pet_pb.GetPetResponse{

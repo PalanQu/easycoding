@@ -1,4 +1,4 @@
-package exception
+package error
 
 import (
 	"context"

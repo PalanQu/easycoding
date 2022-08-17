@@ -23,12 +23,28 @@ func Interceptor(logger *logrus.Logger) func(
 	_ *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler) (interface{}, error) {
 	ops := []grpc_logrus.Option{
-		grpc_logrus.WithLevels(customFunc),
+		grpc_logrus.WithLevels(levelFunc),
 		grpc_logrus.WithDecider(decider),
 	}
 	entry := logrus.NewEntry(logger)
 
-	logInterceptorBefore := func(
+	logInterceptorBefore := createBeforeInterceptor(entry)
+	logInterceptorAfter := createAfterInterceptor(entry)
+
+	return grpc_middleware.ChainUnaryServer(
+		logInterceptorBefore,
+		grpc_logrus.UnaryServerInterceptor(entry, ops...),
+		logInterceptorAfter,
+	)
+}
+
+func createBeforeInterceptor(entry *logrus.Entry) func(
+	ctx context.Context,
+	req interface{},
+	_ *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
+	return func(
 		ctx context.Context,
 		req interface{},
 		_ *grpc.UnaryServerInfo,
@@ -39,7 +55,15 @@ func Interceptor(logger *logrus.Logger) func(
 		grpc_logrus.AddFields(newCtx, fields)
 		return handler(newCtx, req)
 	}
-	logInterceptorAfter := func(ctx context.Context,
+}
+
+func createAfterInterceptor(entry *logrus.Entry) func(
+	ctx context.Context,
+	req interface{},
+	_ *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
+	return func(ctx context.Context,
 		req interface{},
 		_ *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
@@ -58,15 +82,9 @@ func Interceptor(logger *logrus.Logger) func(
 		grpc_logrus.AddFields(ctx, fields)
 		return res, err
 	}
-
-	return grpc_middleware.ChainUnaryServer(
-		logInterceptorBefore,
-		grpc_logrus.UnaryServerInterceptor(entry, ops...),
-		logInterceptorAfter,
-	)
 }
 
-func customFunc(c codes.Code) logrus.Level {
+func levelFunc(c codes.Code) logrus.Level {
 	switch c {
 	case codes.Internal:
 		return logrus.ErrorLevel
