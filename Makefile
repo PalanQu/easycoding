@@ -35,7 +35,7 @@ build: gen-api
 .PHONY: run
 run: gen-api
 	docker-compose up mysql -d
-	sleep 2
+	sleep 3
 	go run cmd/serve/main.go
 
 .PHONY: stop

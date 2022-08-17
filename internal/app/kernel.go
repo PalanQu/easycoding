@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 	"easycoding/internal/config"
-	exception_middleware "easycoding/internal/middleware/exception"
+	error_middleware "easycoding/internal/middleware/error"
 	"fmt"
 
 	log_middleware "easycoding/internal/middleware/log"
@@ -117,7 +117,7 @@ func newGrpcServer(
 			log_middleware.Interceptor(logger),
 			validate_middleware.Interceptor(),
 			recover_middleware.Interceptor(),
-			exception_middleware.Interceptor(logger),
+			error_middleware.Interceptor(logger),
 		)),
 		grpc.MaxSendMsgSize(maxMsgSize),
 		grpc.MaxRecvMsgSize(maxMsgSize),
