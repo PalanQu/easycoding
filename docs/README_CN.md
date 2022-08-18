@@ -775,7 +775,7 @@ make coverage
 make coverage-html
 ```
 
-<img src="docs/pics/coverage.png" style="zoom:50%;" />
+<img src="pics/coverage.png" style="zoom:50%;" />
 
 ### Topic7 交付和部署
 
