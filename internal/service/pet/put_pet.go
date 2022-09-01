@@ -9,7 +9,11 @@ func (s *service) putPet(
 	ctx context.Context,
 	req *pet_pb.PutPetRequest,
 ) (*pet_pb.PutPetResponse, error) {
-	pet, err := s.DB.Pet.Create().SetName(req.Name).SetType(int8(req.PetType)).Save(ctx)
+	pet, err := s.DB.Pet.Create().
+		SetName(req.Name).
+		SetType(int8(req.PetType)).
+		SetAge(0).
+		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
