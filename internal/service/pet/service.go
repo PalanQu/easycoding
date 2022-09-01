@@ -3,19 +3,19 @@ package pet
 import (
 	"context"
 	pet_pb "easycoding/api/pet"
+	"easycoding/pkg/ent"
 
 	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 )
 
 type service struct {
 	Logger *logrus.Logger
-	DB     *gorm.DB
+	DB     *ent.Client
 }
 
 var _ pet_pb.PetStoreSvcServer = (*service)(nil)
 
-func New(logger *logrus.Logger, db *gorm.DB) *service {
+func New(logger *logrus.Logger, db *ent.Client) *service {
 	return &service{
 		Logger: logger,
 		DB:     db,
