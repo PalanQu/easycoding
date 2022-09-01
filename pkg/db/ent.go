@@ -18,13 +18,14 @@ func CreateDBClient(config *config.Config) (*ent.Client, error) {
 			return nil, err
 		}
 	}
-	db, err := sql.Open("mysql", fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
 		config.Database.User,
 		config.Database.Password,
 		config.Database.Host,
 		config.Database.Port,
-	))
+		config.Database.DBName,
+	)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
