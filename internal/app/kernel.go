@@ -12,6 +12,7 @@ import (
 	validate_middleware "easycoding/internal/middleware/validate"
 	"easycoding/internal/service"
 	"easycoding/pkg/db"
+	"easycoding/pkg/ent"
 	"easycoding/pkg/log"
 	"easycoding/pkg/swagger"
 	"io/ioutil"
@@ -33,7 +34,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
-	"gorm.io/gorm"
 )
 
 const (
@@ -65,7 +65,7 @@ type Kernel struct {
 	swaggerServer *http.Server
 	Config        *config.Config
 	Log           *logrus.Logger
-	DB            *gorm.DB
+	DB            *ent.Client
 	state         int
 	wg            *sync.WaitGroup
 	context       cancelContext
@@ -75,7 +75,7 @@ type Kernel struct {
 func New(configPath string) (*Kernel, error) {
 	config := config.LoadConfig(configPath)
 	logger := log.New(os.Stderr, config.Log.Level, config.Log.Dir)
-	database, err := db.CreateGdb(config, logger)
+	database, err := db.CreateDBClient(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to connect to db")
 	}
@@ -109,7 +109,7 @@ func New(configPath string) (*Kernel, error) {
 func newGrpcServer(
 	config *config.Config,
 	logger *logrus.Logger,
-	db *gorm.DB,
+	db *ent.Client,
 ) *grpc.Server {
 	opts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
@@ -298,11 +298,7 @@ func (k *Kernel) Shutdown(ctx context.Context) error {
 	case <-done:
 	}
 
-	sqlDB, err := k.DB.DB()
-	if err != nil {
-		return err
-	}
-	return sqlDB.Close()
+	return k.DB.Close()
 }
 
 func Version() string {

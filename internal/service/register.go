@@ -6,12 +6,12 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"gorm.io/gorm"
 
 	pet_pb "easycoding/api/pet"
 	ping_pb "easycoding/api/ping"
 	pet_svc "easycoding/internal/service/pet"
 	ping_svc "easycoding/internal/service/ping"
+	"easycoding/pkg/ent"
 )
 
 const (
@@ -32,7 +32,7 @@ var endpointFuncs = []RegisterHandlerFromEndpoint{
 }
 
 // RegisterServers register grpc services.
-func RegisterServers(grpcServer *grpc.Server, logger *logrus.Logger, db *gorm.DB) {
+func RegisterServers(grpcServer *grpc.Server, logger *logrus.Logger, db *ent.Client) {
 	ping_pb.RegisterPingSvcServer(grpcServer, ping_svc.New(logger))
 	pet_pb.RegisterPetStoreSvcServer(grpcServer, pet_svc.New(logger, db))
 }

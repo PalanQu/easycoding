@@ -3,36 +3,33 @@ package db
 import (
 	"database/sql"
 	"easycoding/internal/config"
+	"easycoding/pkg/ent"
 	"easycoding/pkg/errors"
 	"fmt"
 
-	"github.com/sirupsen/logrus"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	_ "github.com/go-sql-driver/mysql"
+
+	entsql "entgo.io/ent/dialect/sql"
 )
 
-func CreateGdb(config *config.Config, logger *logrus.Logger) (*gorm.DB, error) {
+func CreateDBClient(config *config.Config) (*ent.Client, error) {
 	if config.Database.CreateDatabase {
 		if err := createDatabase(config); err != nil {
 			return nil, err
 		}
 	}
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+	db, err := sql.Open("mysql", fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/",
 		config.Database.User,
 		config.Database.Password,
 		config.Database.Host,
 		config.Database.Port,
-		config.Database.DBName,
-	)
-	dial := mysql.Open(dsn)
-	return gorm.Open(dial, &gorm.Config{
-		Logger: newGormLogger(logger),
-	})
-}
-
-func CreateTestingGdb(db *sql.DB) (*gorm.DB, error) {
-	return gorm.Open(mysql.New(mysql.Config{
-		Conn: db, SkipInitializeWithVersion: true}), &gorm.Config{})
+	))
+	if err != nil {
+		return nil, err
+	}
+	drv := entsql.OpenDB("mysql", db)
+	return ent.NewClient(ent.Driver(drv)), nil
 }
 
 func createDatabase(config *config.Config) error {
