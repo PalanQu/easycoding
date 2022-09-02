@@ -62,10 +62,10 @@ coverage-html:
 	go tool cover -html=coverage.out
 
 
-# create migrate
-.PHONY: migrate-create
-migrate-create:
-	go run cmd/migrate/main.go create --all
+# generate migratation files
+.PHONY: migrate-generate
+migrate-generate:
+	go run cmd/manage/main.go db-migrate generate
 
 
 # lint

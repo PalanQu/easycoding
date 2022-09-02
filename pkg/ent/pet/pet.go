@@ -11,8 +11,6 @@ const (
 	Label = "pet"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldAge holds the string denoting the age field in the database.
-	FieldAge = "age"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldType holds the string denoting the type field in the database.
@@ -26,7 +24,6 @@ const (
 // Columns holds all SQL columns for pet fields.
 var Columns = []string{
 	FieldID,
-	FieldAge,
 	FieldName,
 	FieldType,
 	FieldCreateAt,
@@ -43,8 +40,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// AgeValidator is a validator for the "age" field. It is called by the builders before save.
-	AgeValidator func(int) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// TypeValidator is a validator for the "type" field. It is called by the builders before save.

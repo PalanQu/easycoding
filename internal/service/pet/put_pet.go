@@ -12,7 +12,6 @@ func (s *service) putPet(
 	pet, err := s.DB.Pet.Create().
 		SetName(req.Name).
 		SetType(int8(req.PetType)).
-		SetAge(0).
 		Save(ctx)
 	if err != nil {
 		return nil, err

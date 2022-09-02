@@ -395,21 +395,22 @@ buf breaking   --against "../../.git#branch=master,subdir=api/pet_apis"
 4. 数据库的权限控制的不好，有可能有其他人因为一些原因，到数据库中执行了一些sql脚本，但是没有告诉其他人，其他人在升级过程中出错，没有办法判断是谁的错
 5. 因为某些原因使得生产环境版本回滚，数据库也应该回滚，很多写代码的人只会写升级sql文件，不会写降级的sql文件，使得没有办法干净的回滚
 
-在代码中写sql来对数据库进行操作是很难维护的，通常是使用ORM作为中间层来进行交互，本项目使用[Gorm](https://github.com/go-gorm/gorm)，另一个问题是随着业务的迭代，我们经常会更新数据库结构，这是必然的，但是在很多公司，写代码和部署代码不是同一个人，部署代码的人只能僵硬的去执行写代码的人给的sql升级文件，如果一旦出现错误，无法判断如何解决，而且经常业务会有升级和回滚，一方面代码本身要使用【双写】等等的机制来保证数据表的向前兼容，但是表结构本身也要支持版本管理，那就必然需要回滚。另一方面，我们如果有了升级的文件就可以比较容易的结合CI、CD流程集成测试，自动升级。最后一个问题是我们手动的写升级和降级的sql文件是非常困难的，也比较难以维护，所以尽量可以做到自动生成。
+在代码中写sql来对数据库进行操作是很难维护的，通常是使用ORM作为中间层来进行交互，本项目使用[ent](https://github.com/ent/ent)，另一个问题是随着业务的迭代，我们经常会更新数据库结构，这是必然的，但是在很多公司，写代码和部署代码不是同一个人，部署代码的人只能僵硬的去执行写代码的人给的sql升级文件，如果一旦出现错误，无法判断如何解决，而且经常业务会有升级和回滚，一方面代码本身要使用【双写】等等的机制来保证数据表的向前兼容，但是表结构本身也要支持版本管理，那就必然需要回滚。另一方面，我们如果有了升级的文件就可以比较容易的结合CI、CD流程集成测试，自动升级。最后一个问题是我们手动的写升级和降级的sql文件是非常困难的，也比较难以维护，所以尽量可以做到自动生成。
 
 #### 开始
 
 现在 `test` 数据库完全是空的，使用以下命令来创建数据库初始化sql文件
 
 ``` bash
-make migrate-create
+make migrate-generate
 ```
 
 执行成功后会生成以下文件, 如果想了解为什么会是这种结构，可以查看[migrate](https://github.com/golang-migrate/migrate)
 
 ``` text
-migrations/pet/{timestamp}_pet.up.sql
-migrations/pet/{timestamp}_pet.down.sql
+migrations/{timestamp}_changes.up.sql
+migrations/{timestamp}_changes.down.sql
+atlas.sum
 ```
 
 通常在云原生的场景下，升级数据库结构，通常是要启动一个[kubernetes job](https://kubernetes.io/docs/concepts/workloads/controllers/job/)，所以这个命令没有和makefile结合
@@ -419,43 +420,51 @@ go run cmd/migrate/main.go step --latest
 ```
 
 ``` text
-INFO[0000] Start buffering 20220723144816/u pet
-INFO[0000] Read and execute 20220723144816/u pet
-INFO[0000] Finished 20220723144816/u pet (read 5.465976ms, ran 57.983119ms)
+INFO[0000] Start buffering 20220902103358/u changes
+INFO[0000] Read and execute 20220902103358/u changes
+INFO[0000] Finished 20220902103358/u changes (read 2.679112ms, ran 10.382479ms)
 ```
 
-升级成功，使用 `describe pet` 查看表结构
+升级成功，使用 `describe pets` 查看表结构
 
 ``` text
-+------------+----------+------+-----+-------------------+-------------------+
-| Field      | Type     | Null | Key | Default           | Extra             |
-+------------+----------+------+-----+-------------------+-------------------+
-| id         | int      | YES  |     | NULL              |                   |
-| name       | text     | YES  |     | NULL              |                   |
-| type       | int      | YES  |     | NULL              |                   |
-| created_at | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+------------+----------+------+-----+-------------------+-------------------+
-4 rows in set (0.01 sec)
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| id        | bigint       | NO   | PRI | NULL    | auto_increment |
+| name      | varchar(255) | NO   |     | NULL    |                |
+| type      | tinyint      | NO   |     | NULL    |                |
+| create_at | timestamp    | NO   |     | NULL    |                |
++-----------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
 ```
 
-更新 pkg/orm/pet.go
+更新 pkg/ent/schema/pet.go
 
 ``` text
---- a/pkg/orm/pet.go
-+++ b/pkg/orm/pet.go
-@@ -12,6 +12,7 @@ type Pet struct {
-        Name string
-        // TODO(qujiabao): replace int32 to pet_pb.PetType, because of `sqlize`
-        Type      int32
-+       Age       int32
-        CreatedAt time.Time `gorm:"default:now()"`
- }
+--- a/pkg/ent/schema/pet.go
++++ b/pkg/ent/schema/pet.go
+@@ -15,8 +15,8 @@ type Pet struct {
+ // Fields of the Pet.
+ func (Pet) Fields() []ent.Field {
+        return []ent.Field{
+                field.String("name").NotEmpty(),
++               field.Int32("age").NonNegative(),
+                field.Int8("type").NonNegative(),
+                field.Time("create_at").Default(time.Now()),
+        }
 ```
 
-再次生成数据库升级和降级文件，又有两个文件生成了，这时候 migrations/pet下面会有四个文件
+生成orm文件
 
 ``` bash
-make migrate-create
+go generate ./pkg/ent
+```
+
+再次生成数据库升级和降级文件，又有两个文件生成了，这时候 migrations/pet下面会有5个文件
+
+``` bash
+make migrate-generate
 ```
 
 升级
@@ -475,15 +484,15 @@ Version: 20220723150428, Dirty: false
 ```
 
 ``` text
-+------------+----------+------+-----+-------------------+-------------------+
-| Field      | Type     | Null | Key | Default           | Extra             |
-+------------+----------+------+-----+-------------------+-------------------+
-| id         | int      | YES  |     | NULL              |                   |
-| name       | text     | YES  |     | NULL              |                   |
-| type       | int      | YES  |     | NULL              |                   |
-| age        | int      | YES  |     | NULL              |                   |
-| created_at | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+------------+----------+------+-----+-------------------+-------------------+
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| id        | bigint       | NO   | PRI | NULL    | auto_increment |
+| name      | varchar(255) | NO   |     | NULL    |                |
+| type      | tinyint      | NO   |     | NULL    |                |
+| create_at | timestamp    | NO   |     | NULL    |                |
+| age       | int          | NO   |     | NULL    |                |
++-----------+--------------+------+-----+---------+----------------+
 5 rows in set (0.00 sec)
 ```
 
@@ -496,14 +505,14 @@ go run cmd/migrate/main.go step 1 --reverse
 ``` text
 Version: 20220723144816, Dirty: false
 
-+------------+----------+------+-----+-------------------+-------------------+
-| Field      | Type     | Null | Key | Default           | Extra             |
-+------------+----------+------+-----+-------------------+-------------------+
-| id         | int      | YES  |     | NULL              |                   |
-| name       | text     | YES  |     | NULL              |                   |
-| type       | int      | YES  |     | NULL              |                   |
-| created_at | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+------------+----------+------+-----+-------------------+-------------------+
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| id        | bigint       | NO   | PRI | NULL    | auto_increment |
+| name      | varchar(255) | NO   |     | NULL    |                |
+| type      | tinyint      | NO   |     | NULL    |                |
+| create_at | timestamp    | NO   |     | NULL    |                |
++-----------+--------------+------+-----+---------+----------------+
 4 rows in set (0.00 sec)
 ```
 
