@@ -4,6 +4,7 @@ import (
 	"os"
 
 	config_cmd "easycoding/cmd/manage/cmd/config"
+	migrate_cmd "easycoding/cmd/manage/cmd/db_migrate"
 	proto_cmd "easycoding/cmd/manage/cmd/proto"
 
 	"github.com/spf13/cobra"
@@ -26,6 +27,7 @@ func InitCmd() error {
 	rootCmd.PersistentFlags().BoolVarP(&dryrun, "dry-run", "n", false, "--dry-run")
 	proto_cmd.Init(rootCmd)
 	config_cmd.Init(rootCmd)
+	migrate_cmd.Init(rootCmd)
 	return nil
 }
 

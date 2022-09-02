@@ -14,7 +14,7 @@ import (
 
 func CreateDBClient(config *config.Config) (*ent.Client, error) {
 	if config.Database.CreateDatabase {
-		if err := createDatabase(config); err != nil {
+		if err := CreateDatabase(config); err != nil {
 			return nil, err
 		}
 	}
@@ -33,7 +33,7 @@ func CreateDBClient(config *config.Config) (*ent.Client, error) {
 	return ent.NewClient(ent.Driver(drv)), nil
 }
 
-func createDatabase(config *config.Config) error {
+func CreateDatabase(config *config.Config) error {
 	db, err := sql.Open("mysql", fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/",
 		config.Database.User,

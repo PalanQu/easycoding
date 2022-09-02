@@ -1,6 +1,6 @@
 database:
     create_database: true
-    db_name: test
+    db_name: _migration_dev
     host: localhost
     password: root
     port: "3306"
