@@ -20,12 +20,6 @@ type PetCreate struct {
 	hooks    []Hook
 }
 
-// SetAge sets the "age" field.
-func (pc *PetCreate) SetAge(i int) *PetCreate {
-	pc.mutation.SetAge(i)
-	return pc
-}
-
 // SetName sets the "name" field.
 func (pc *PetCreate) SetName(s string) *PetCreate {
 	pc.mutation.SetName(s)
@@ -137,14 +131,6 @@ func (pc *PetCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PetCreate) check() error {
-	if _, ok := pc.mutation.Age(); !ok {
-		return &ValidationError{Name: "age", err: errors.New(`ent: missing required field "Pet.age"`)}
-	}
-	if v, ok := pc.mutation.Age(); ok {
-		if err := pet.AgeValidator(v); err != nil {
-			return &ValidationError{Name: "age", err: fmt.Errorf(`ent: validator failed for field "Pet.age": %w`, err)}
-		}
-	}
 	if _, ok := pc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Pet.name"`)}
 	}
@@ -191,14 +177,6 @@ func (pc *PetCreate) createSpec() (*Pet, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := pc.mutation.Age(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: pet.FieldAge,
-		})
-		_node.Age = value
-	}
 	if value, ok := pc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,

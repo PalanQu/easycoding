@@ -386,7 +386,7 @@ buf breaking   --against "../../.git#branch=master,subdir=api/pet_apis"
 #### Motivation
 
 Write raw sql to operate database is not easy to maintain, we use ORM to
-interact with database, [Gorm](https://github.com/go-gorm/gorm) for this
+interact with database, [ent](https://github.com/ent/ent) for this
 project. Another situation we encounter is that we often upgrade the structure
 of the database, firstly, in many compaines, people who write the code and
 deploy applications are different, so it is necessary to manage upgrade and
@@ -400,15 +400,16 @@ For the current time, the database `test` is totally empty, use the following
 command to create auto migration sql files
 
 ``` bash
-make migrate-create
+make migrate-generate
 ```
 
 The following files will be generated, see
 [migrate](https://github.com/golang-migrate/migrate) for more information
 
 ``` text
-migrations/pet/{timestamp}_pet.up.sql
-migrations/pet/{timestamp}_pet.down.sql
+migrations/{timestamp}_changes.up.sql
+migrations/{timestamp}_changes.down.sql
+atlas.sum
 ```
 
 Migrate sql to database, in the cloud native scenario, you usually need to start
@@ -420,44 +421,52 @@ go run cmd/migrate/main.go step --latest
 ```
 
 ``` text
-INFO[0000] Start buffering 20220723144816/u pet
-INFO[0000] Read and execute 20220723144816/u pet
-INFO[0000] Finished 20220723144816/u pet (read 5.465976ms, ran 57.983119ms)
+INFO[0000] Start buffering 20220902103358/u changes
+INFO[0000] Read and execute 20220902103358/u changes
+INFO[0000] Finished 20220902103358/u changes (read 2.679112ms, ran 10.382479ms)
 ```
 
-Migrate successful, use `describe pet` to check the schema of table pet
+Migrate successful, use `describe pets` to check the schema of table pets
 
 ``` text
-+------------+----------+------+-----+-------------------+-------------------+
-| Field      | Type     | Null | Key | Default           | Extra             |
-+------------+----------+------+-----+-------------------+-------------------+
-| id         | int      | YES  |     | NULL              |                   |
-| name       | text     | YES  |     | NULL              |                   |
-| type       | int      | YES  |     | NULL              |                   |
-| created_at | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+------------+----------+------+-----+-------------------+-------------------+
-4 rows in set (0.01 sec)
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| id        | bigint       | NO   | PRI | NULL    | auto_increment |
+| name      | varchar(255) | NO   |     | NULL    |                |
+| type      | tinyint      | NO   |     | NULL    |                |
+| create_at | timestamp    | NO   |     | NULL    |                |
++-----------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
 ```
 
-Update pkg/orm/pet.go
+Update pkg/ent/schema/pet.go
 
 ``` text
---- a/pkg/orm/pet.go
-+++ b/pkg/orm/pet.go
-@@ -12,6 +12,7 @@ type Pet struct {
-        Name string
-        // TODO(qujiabao): replace int32 to pet_pb.PetType, because of `sqlize`
-        Type      int32
-+       Age       int32
-        CreatedAt time.Time `gorm:"default:now()"`
- }
+--- a/pkg/ent/schema/pet.go
++++ b/pkg/ent/schema/pet.go
+@@ -15,8 +15,8 @@ type Pet struct {
+ // Fields of the Pet.
+ func (Pet) Fields() []ent.Field {
+        return []ent.Field{
+                field.String("name").NotEmpty(),
++               field.Int32("age").NonNegative(),
+                field.Int8("type").NonNegative(),
+                field.Time("create_at").Default(time.Now()),
+        }
 ```
 
-Create migration files and two files will be generated, and there are four files
-in migrations/pet
+Generate orm files
 
 ``` bash
-make migrate-create
+go generate ./pkg/ent
+```
+
+Create migration files and two more files will be generated, and there are five
+files in migrations/pet
+
+``` bash
+make migrate-generate
 ```
 
 Step up
@@ -477,15 +486,15 @@ Version: 20220723150428, Dirty: false
 ```
 
 ``` text
-+------------+----------+------+-----+-------------------+-------------------+
-| Field      | Type     | Null | Key | Default           | Extra             |
-+------------+----------+------+-----+-------------------+-------------------+
-| id         | int      | YES  |     | NULL              |                   |
-| name       | text     | YES  |     | NULL              |                   |
-| type       | int      | YES  |     | NULL              |                   |
-| age        | int      | YES  |     | NULL              |                   |
-| created_at | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+------------+----------+------+-----+-------------------+-------------------+
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| id        | bigint       | NO   | PRI | NULL    | auto_increment |
+| name      | varchar(255) | NO   |     | NULL    |                |
+| type      | tinyint      | NO   |     | NULL    |                |
+| create_at | timestamp    | NO   |     | NULL    |                |
+| age       | int          | NO   |     | NULL    |                |
++-----------+--------------+------+-----+---------+----------------+
 5 rows in set (0.00 sec)
 ```
 
@@ -498,14 +507,14 @@ go run cmd/migrate/main.go step 1 --reverse
 ``` text
 Version: 20220723144816, Dirty: false
 
-+------------+----------+------+-----+-------------------+-------------------+
-| Field      | Type     | Null | Key | Default           | Extra             |
-+------------+----------+------+-----+-------------------+-------------------+
-| id         | int      | YES  |     | NULL              |                   |
-| name       | text     | YES  |     | NULL              |                   |
-| type       | int      | YES  |     | NULL              |                   |
-| created_at | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+------------+----------+------+-----+-------------------+-------------------+
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| id        | bigint       | NO   | PRI | NULL    | auto_increment |
+| name      | varchar(255) | NO   |     | NULL    |                |
+| type      | tinyint      | NO   |     | NULL    |                |
+| create_at | timestamp    | NO   |     | NULL    |                |
++-----------+--------------+------+-----+---------+----------------+
 4 rows in set (0.00 sec)
 ```
 

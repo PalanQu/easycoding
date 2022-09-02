@@ -15,7 +15,6 @@ type Pet struct {
 // Fields of the Pet.
 func (Pet) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("age").NonNegative(),
 		field.String("name").NotEmpty(),
 		field.Int8("type").NonNegative(),
 		field.Time("create_at").Default(time.Now()),

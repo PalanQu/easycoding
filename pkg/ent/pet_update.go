@@ -28,19 +28,6 @@ func (pu *PetUpdate) Where(ps ...predicate.Pet) *PetUpdate {
 	return pu
 }
 
-// SetAge sets the "age" field.
-func (pu *PetUpdate) SetAge(i int) *PetUpdate {
-	pu.mutation.ResetAge()
-	pu.mutation.SetAge(i)
-	return pu
-}
-
-// AddAge adds i to the "age" field.
-func (pu *PetUpdate) AddAge(i int) *PetUpdate {
-	pu.mutation.AddAge(i)
-	return pu
-}
-
 // SetName sets the "name" field.
 func (pu *PetUpdate) SetName(s string) *PetUpdate {
 	pu.mutation.SetName(s)
@@ -141,11 +128,6 @@ func (pu *PetUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (pu *PetUpdate) check() error {
-	if v, ok := pu.mutation.Age(); ok {
-		if err := pet.AgeValidator(v); err != nil {
-			return &ValidationError{Name: "age", err: fmt.Errorf(`ent: validator failed for field "Pet.age": %w`, err)}
-		}
-	}
 	if v, ok := pu.mutation.Name(); ok {
 		if err := pet.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Pet.name": %w`, err)}
@@ -176,20 +158,6 @@ func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := pu.mutation.Age(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: pet.FieldAge,
-		})
-	}
-	if value, ok := pu.mutation.AddedAge(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: pet.FieldAge,
-		})
 	}
 	if value, ok := pu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -236,19 +204,6 @@ type PetUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *PetMutation
-}
-
-// SetAge sets the "age" field.
-func (puo *PetUpdateOne) SetAge(i int) *PetUpdateOne {
-	puo.mutation.ResetAge()
-	puo.mutation.SetAge(i)
-	return puo
-}
-
-// AddAge adds i to the "age" field.
-func (puo *PetUpdateOne) AddAge(i int) *PetUpdateOne {
-	puo.mutation.AddAge(i)
-	return puo
 }
 
 // SetName sets the "name" field.
@@ -364,11 +319,6 @@ func (puo *PetUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (puo *PetUpdateOne) check() error {
-	if v, ok := puo.mutation.Age(); ok {
-		if err := pet.AgeValidator(v); err != nil {
-			return &ValidationError{Name: "age", err: fmt.Errorf(`ent: validator failed for field "Pet.age": %w`, err)}
-		}
-	}
 	if v, ok := puo.mutation.Name(); ok {
 		if err := pet.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Pet.name": %w`, err)}
@@ -416,20 +366,6 @@ func (puo *PetUpdateOne) sqlSave(ctx context.Context) (_node *Pet, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := puo.mutation.Age(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: pet.FieldAge,
-		})
-	}
-	if value, ok := puo.mutation.AddedAge(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: pet.FieldAge,
-		})
 	}
 	if value, ok := puo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
