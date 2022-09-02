@@ -5,8 +5,10 @@ import (
 	"easycoding/common/workspace"
 	"easycoding/pkg/db"
 	"easycoding/pkg/ent/migrate"
+	"errors"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 
 	"ariga.io/atlas/sql/sqltool"
@@ -21,6 +23,13 @@ var generateCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if config.Database.CreateDatabase {
 			if err := db.CreateDatabase(config); err != nil {
+				return err
+			}
+		}
+		migrationDir := filepath.Join(workspace.GetWorkspace(), "migrations")
+		if _, err := os.Stat(migrationDir); errors.Is(err, os.ErrNotExist) {
+			err := os.Mkdir(migrationDir, os.ModePerm)
+			if err != nil {
 				return err
 			}
 		}
