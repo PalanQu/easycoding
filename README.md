@@ -18,7 +18,7 @@ This project loosely follows [Uncle Bob's Clean Architecture](https://blog.clean
 - Auto generate grpc, grpc gateway, validate go files
 - Provide both rest api and grpc api
 - Auto generate swagger api document
-- Breaking change detection(WIP)
+- Breaking change detection
 - Builtin prometheus metrics
 - Support import api definition by postman
 - Run in docker
