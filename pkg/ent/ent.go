@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"easycoding/pkg/ent/pet"
+	"easycoding/pkg/ent/user"
 	"errors"
 	"fmt"
 
@@ -31,7 +32,8 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		pet.Table: pet.ValidColumn,
+		pet.Table:  pet.ValidColumn,
+		user.Table: user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {
