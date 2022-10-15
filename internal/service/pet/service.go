@@ -13,6 +13,13 @@ type service struct {
 	DB     *ent.Client
 }
 
+// AuthFuncOverride overrides global AuthFunc, this is used to escape from Auth
+// Interceptor.
+func (*service) AuthFuncOverride(
+	ctx context.Context, _ string) (context.Context, error) {
+	return ctx, nil
+}
+
 var _ pet_pb.PetStoreSvcServer = (*service)(nil)
 
 func New(logger *logrus.Logger, db *ent.Client) *service {

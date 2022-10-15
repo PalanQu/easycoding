@@ -6,6 +6,7 @@ import (
 	error_middleware "easycoding/internal/middleware/error"
 	"fmt"
 
+	auth_middleware "easycoding/internal/middleware/auth"
 	log_middleware "easycoding/internal/middleware/log"
 	prometheus_middleware "easycoding/internal/middleware/prometheus"
 	recover_middleware "easycoding/internal/middleware/recover"
@@ -83,7 +84,7 @@ func New(configPath string) (*Kernel, error) {
 	// Create a global application context.
 	ctx, cancel := context.WithCancel(context.Background())
 
-	gwServer := newGrpcGatewayServer(config)
+	gwServer := newGrpcGatewayServer(config, logger)
 	grpcServer := newGrpcServer(config, logger, database)
 	swaggerServer := newSwaggerServer(config)
 
@@ -113,11 +114,12 @@ func newGrpcServer(
 ) *grpc.Server {
 	opts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			prometheus_middleware.Interceptor(),
 			log_middleware.Interceptor(logger),
-			validate_middleware.Interceptor(),
 			recover_middleware.Interceptor(),
+			auth_middleware.Interceptor(),
+			validate_middleware.Interceptor(),
 			error_middleware.Interceptor(logger),
+			prometheus_middleware.Interceptor(),
 		)),
 		grpc.MaxSendMsgSize(maxMsgSize),
 		grpc.MaxRecvMsgSize(maxMsgSize),
@@ -138,8 +140,10 @@ func newGrpcServer(
 	return grpcServer
 }
 
-func newGrpcGatewayServer(config *config.Config) *http.Server {
-	gwmux := runtime.NewServeMux()
+func newGrpcGatewayServer(config *config.Config, logger *logrus.Logger) *http.Server {
+	gwmux := runtime.NewServeMux(
+		runtime.WithMetadata(readFromRequest(logger)),
+	)
 	router := mux.NewRouter()
 	router.PathPrefix("/").Handler(gwmux)
 	gwServer := &http.Server{

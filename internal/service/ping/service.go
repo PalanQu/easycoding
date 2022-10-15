@@ -12,6 +12,13 @@ type service struct {
 	Logger *logrus.Logger
 }
 
+// AuthFuncOverride overrides global AuthFunc, this is used to escape from Auth
+// Interceptor.
+func (*service) AuthFuncOverride(
+	ctx context.Context, _ string) (context.Context, error) {
+	return ctx, nil
+}
+
 var _ ping_pb.PingSvcServer = (*service)(nil)
 
 func New(logger *logrus.Logger) *service {
