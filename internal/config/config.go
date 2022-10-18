@@ -12,6 +12,7 @@ type Config struct {
 	Server   ServerConfig   `mapstructure:"serveer"`
 	Database DatabaseConfig `mapstructure:"database"`
 	Log      LogConfig      `mapstructure:"log"`
+	Daemon   DaemonConfig   `mapstructure:"daemon"`
 }
 
 func LoadConfig(configPath string) *Config {
@@ -37,6 +38,9 @@ func LoadConfig(configPath string) *Config {
 		Log: LogConfig{
 			Level: viper.GetString("log.level"),
 			Dir:   viper.GetString("log.dir"),
+		},
+		Daemon: DaemonConfig{
+			DurationSeconds: viper.GetInt("daemon.duration_seconds"),
 		},
 	}
 }
@@ -74,6 +78,8 @@ func SetDefaults() {
 
 	viper.SetDefault("log.level", defaultConfig.Log.Level)
 	viper.SetDefault("log.dir", defaultConfig.Log.Dir)
+
+	viper.SetDefault("daemon.duration_seconds", defaultConfig.Daemon.DurationSeconds)
 }
 
 func bindEnvs(iface interface{}, parts ...string) {

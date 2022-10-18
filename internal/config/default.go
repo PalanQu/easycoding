@@ -18,4 +18,7 @@ var defaultConfig = Config{
 		Level: "INFO",
 		Dir:   "",
 	},
+	Daemon: DaemonConfig{
+		DurationSeconds: 10,
+	},
 }
