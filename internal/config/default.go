@@ -19,6 +19,8 @@ var defaultConfig = Config{
 		Dir:   "",
 	},
 	Daemon: DaemonConfig{
-		DurationSeconds: 10,
+		ExampleDaemon: ExampleDaemon{
+			DurationSeconds: 5,
+		},
 	},
 }

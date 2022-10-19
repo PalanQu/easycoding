@@ -21,8 +21,6 @@ type Manager struct {
 	wg *sync.WaitGroup
 	// ctx is used to signal cancellation to running daemons.
 	ctx context.Context
-	// duration is the duration of running the daemons.
-	duration time.Duration
 }
 
 // NewManager returns a new manager instance.
@@ -30,13 +28,11 @@ func NewManager(
 	ctx context.Context,
 	wg *sync.WaitGroup,
 	l *logrus.Logger,
-	duration time.Duration,
 ) *Manager {
 	return &Manager{
-		ctx:      ctx,
-		wg:       wg,
-		log:      l,
-		duration: duration,
+		ctx: ctx,
+		wg:  wg,
+		log: l,
 	}
 }
 
@@ -51,15 +47,13 @@ func (m *Manager) Start(d Daemon) {
 	logger := m.log
 	go m.recoverPanic(d, m.log)
 
-	ticker := time.NewTimer(m.duration)
-	for range ticker.C {
+	for {
 		select {
 		// If the daemon should stop, wait for the wg to be done, then
 		// stop the restart ticket and exit the method.
 		case <-m.ctx.Done():
 			wg.Wait()
 			logger.Infof(`daemon "%s" shutdown complete`, d.Name())
-			ticker.Stop()
 			return
 		default:
 			try++

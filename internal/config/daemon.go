@@ -1,5 +1,9 @@
 package config
 
 type DaemonConfig struct {
-	DurationSeconds int `mapstructure:"duration_seconds"`
+	ExampleDaemon ExampleDaemon `mapstructure:"example_daemon"`
+}
+
+type ExampleDaemon struct {
+	DurationSeconds int `mapstructure:"example_daemon"`
 }
