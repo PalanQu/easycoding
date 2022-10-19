@@ -40,7 +40,9 @@ func LoadConfig(configPath string) *Config {
 			Dir:   viper.GetString("log.dir"),
 		},
 		Daemon: DaemonConfig{
-			DurationSeconds: viper.GetInt("daemon.duration_seconds"),
+			ExampleDaemon: ExampleDaemon{
+				DurationSeconds: viper.GetInt("daemon.example_daemon.duration_seconds"),
+			},
 		},
 	}
 }
@@ -79,7 +81,7 @@ func SetDefaults() {
 	viper.SetDefault("log.level", defaultConfig.Log.Level)
 	viper.SetDefault("log.dir", defaultConfig.Log.Dir)
 
-	viper.SetDefault("daemon.duration_seconds", defaultConfig.Daemon.DurationSeconds)
+	viper.SetDefault("daemon.example_daemon.duration_seconds", defaultConfig.Daemon.ExampleDaemon.DurationSeconds)
 }
 
 func bindEnvs(iface interface{}, parts ...string) {
