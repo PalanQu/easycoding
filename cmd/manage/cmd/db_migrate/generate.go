@@ -47,6 +47,8 @@ var generateCmd = &cobra.Command{
 			schema.WithMigrationMode(schema.ModeReplay), // provide migration mode
 			schema.WithDialect(dialect.MySQL),           // Ent dialect to use
 			schema.WithFormatter(sqltool.GolangMigrateFormatter),
+			schema.WithDropColumn(true),
+			schema.WithDropIndex(true),
 		}
 		// Generate migrations using Atlas support for MySQL (note the Ent
 		// dialect option passed above).
