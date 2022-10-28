@@ -65,6 +65,7 @@ coverage-html:
 # generate migratation files
 .PHONY: migrate-generate
 migrate-generate:
+	go generate ./pkg/ent
 	go run cmd/manage/main.go db-migrate generate
 
 
