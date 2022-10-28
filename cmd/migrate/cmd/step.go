@@ -3,7 +3,6 @@ package cmd
 import (
 	"database/sql"
 	"easycoding/common/workspace"
-	c "easycoding/internal/config"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -91,5 +90,4 @@ func initStep() {
 	rootCmd.AddCommand(stepCmd)
 	stepCmd.Flags().BoolVar(&stepLatest, "latest", false, "--latest")
 	stepCmd.Flags().BoolVar(&stepReverse, "reverse", false, "--reverse")
-	config = c.LoadConfig(configPath)
 }

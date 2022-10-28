@@ -3,7 +3,6 @@ package cmd
 import (
 	"database/sql"
 	"easycoding/common/workspace"
-	c "easycoding/internal/config"
 	"easycoding/pkg/db"
 	"fmt"
 	"path/filepath"
@@ -49,7 +48,6 @@ var versionCmd = &cobra.Command{
 
 func initVersion() error {
 	rootCmd.AddCommand(versionCmd)
-	config = c.LoadConfig(configPath)
 	if config.Database.CreateDatabase {
 		if err := db.CreateDatabase(config); err != nil {
 			return err
