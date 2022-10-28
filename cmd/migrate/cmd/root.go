@@ -62,7 +62,9 @@ func InitCmd() error {
 		&migrationDir, "migrate-path", "p", defaultMigrationDir, "--migrate-path")
 	rootCmd.PersistentFlags().StringVar(
 		&configPath, "config", "./config.yaml", "--config")
+	config = c.LoadConfig(configPath)
 	initStep()
+	initDiff()
 	return initVersion()
 }
 
