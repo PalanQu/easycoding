@@ -1,3 +1,6 @@
+daemon:
+    example_daemon:
+        example_daemon: "5"
 database:
     create_database: true
     db_name: test
