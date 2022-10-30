@@ -18,8 +18,7 @@ var generateCmd = &cobra.Command{
 	Short: "Generate config.yaml file",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryrun := getDryrun(cmd)
-		viper.SetConfigFile("config.yaml")
-		config.SetDefaults()
+		config.LoadConfig("config.yaml")
 		if dryrun {
 			// TODO(qujiabao): print pretty
 			fmt.Println(viper.AllSettings())

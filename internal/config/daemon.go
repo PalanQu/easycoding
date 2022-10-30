@@ -5,5 +5,5 @@ type DaemonConfig struct {
 }
 
 type ExampleDaemon struct {
-	DurationSeconds int `mapstructure:"example_daemon"`
+	DurationSeconds int `mapstructure:"example_daemon" defaultvalue:"5"`
 }
