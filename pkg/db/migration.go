@@ -1,7 +1,7 @@
 package db
 
 import (
-	"easycoding/pkg/errors"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"regexp"
@@ -18,11 +18,11 @@ const (
 
 func MigrationGenerate(migrationDir string, from, to int) (MigrationDirection, int, error) {
 	if from == to {
-		return "", 0, errors.ErrInvalidRaw("'from' equals to 'to'")
+		return "", 0, errors.New("'from' equals to 'to'")
 	}
 	files, err := ioutil.ReadDir(migrationDir)
 	if err != nil {
-		return "", 0, errors.ErrInvalid(err)
+		return "", 0, err
 	}
 	migrationSteps := []int{}
 	for _, f := range files {
@@ -35,7 +35,7 @@ func MigrationGenerate(migrationDir string, from, to int) (MigrationDirection, i
 		}
 		matches := r.FindSubmatch([]byte(f.Name()))
 		if len(matches) != 3 {
-			return "", 0, errors.ErrInvalidRaw(fmt.Sprintf("invalid match %s", f.Name()))
+			return "", 0, errors.New(fmt.Sprintf("invalid match %s", f.Name()))
 		}
 		timestampStr := string(matches[1])
 		timestamp, err := strconv.Atoi(timestampStr)
@@ -51,7 +51,7 @@ func MigrationGenerate(migrationDir string, from, to int) (MigrationDirection, i
 	fromIndex := indexOf(migrationSteps, from)
 	toIndex := indexOf(migrationSteps, to)
 	if fromIndex == -1 || toIndex == -1 {
-		return "", 0, errors.ErrInternalRaw(fmt.Sprintf("error from/to name %v, %v", from, to))
+		return "", 0, errors.New(fmt.Sprintf("error from/to name %v, %v", from, to))
 	}
 	if fromIndex < toIndex {
 		return MigrationDirectionUP, toIndex - fromIndex, nil
