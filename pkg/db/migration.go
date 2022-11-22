@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"regexp"
 	"sort"
+	"strconv"
 )
 
 type MigrationDirection string
@@ -15,7 +16,7 @@ const (
 	MigrationDirectionDown MigrationDirection = "down"
 )
 
-func MigrationGenerate(migrationDir string, from, to string) (MigrationDirection, int, error) {
+func MigrationGenerate(migrationDir string, from, to int) (MigrationDirection, int, error) {
 	if from == to {
 		return "", 0, errors.ErrInvalidRaw("'from' equals to 'to'")
 	}
@@ -23,7 +24,7 @@ func MigrationGenerate(migrationDir string, from, to string) (MigrationDirection
 	if err != nil {
 		return "", 0, errors.ErrInvalid(err)
 	}
-	migrationSteps := []string{}
+	migrationSteps := []int{}
 	for _, f := range files {
 		if f.IsDir() {
 			continue
@@ -36,16 +37,21 @@ func MigrationGenerate(migrationDir string, from, to string) (MigrationDirection
 		if len(matches) != 3 {
 			return "", 0, errors.ErrInvalidRaw(fmt.Sprintf("invalid match %s", f.Name()))
 		}
-		timestamp := string(matches[1])
+		timestampStr := string(matches[1])
+		timestamp, err := strconv.Atoi(timestampStr)
+		if err != nil {
+			return "", 0, err
+		}
+
 		if !contains(migrationSteps, timestamp) {
 			migrationSteps = append(migrationSteps, timestamp)
 		}
 	}
-	sort.Strings(migrationSteps)
+	sort.Slice(migrationSteps, func(i, j int) bool { return migrationSteps[i] < migrationSteps[j] })
 	fromIndex := indexOf(migrationSteps, from)
 	toIndex := indexOf(migrationSteps, to)
 	if fromIndex == -1 || toIndex == -1 {
-		return "", 0, errors.ErrInternalRaw(fmt.Sprintf("error from/to name %s, %s", from, to))
+		return "", 0, errors.ErrInternalRaw(fmt.Sprintf("error from/to name %v, %v", from, to))
 	}
 	if fromIndex < toIndex {
 		return MigrationDirectionUP, toIndex - fromIndex, nil
@@ -53,19 +59,19 @@ func MigrationGenerate(migrationDir string, from, to string) (MigrationDirection
 	return MigrationDirectionDown, fromIndex - toIndex, nil
 }
 
-func contains(list []string, s string) bool {
+func contains(list []int, i int) bool {
 	for _, l := range list {
-		if l == s {
+		if l == i {
 			return true
 		}
 	}
 	return false
 }
 
-func indexOf(list []string, s string) int {
-	for i, l := range list {
-		if l == s {
-			return i
+func indexOf(list []int, i int) int {
+	for index, l := range list {
+		if l == i {
+			return index
 		}
 	}
 	return -1

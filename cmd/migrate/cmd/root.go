@@ -65,6 +65,7 @@ func InitCmd() error {
 	config = c.LoadConfig(configPath)
 	initStep()
 	initDiff()
+	initTo()
 	return initVersion()
 }
 
