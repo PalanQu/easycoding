@@ -2,7 +2,6 @@ package daemon
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -31,7 +30,7 @@ func (g *Example) Run(ctx context.Context, wg *sync.WaitGroup, logger *logrus.Lo
 		for {
 			select {
 			case <-time.After(time.Duration(g.periodSeconds) * time.Second):
-				fmt.Println("running example daemon")
+				// do something
 			case <-ctx.Done():
 				logger.Debug("example daemon is shutting down...")
 				return
