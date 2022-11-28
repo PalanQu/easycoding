@@ -3,11 +3,12 @@ package app
 import (
 	"context"
 	"easycoding/internal/config"
-	error_middleware "easycoding/internal/middleware/error"
 	"fmt"
 
 	auth_middleware "easycoding/internal/middleware/auth"
+	error_middleware "easycoding/internal/middleware/error"
 	log_middleware "easycoding/internal/middleware/log"
+	otel_middleware "easycoding/internal/middleware/otel"
 	prometheus_middleware "easycoding/internal/middleware/prometheus"
 	recover_middleware "easycoding/internal/middleware/recover"
 	validate_middleware "easycoding/internal/middleware/validate"
@@ -15,6 +16,8 @@ import (
 	"easycoding/pkg/db"
 	"easycoding/pkg/ent"
 	"easycoding/pkg/log"
+
+	pkg_otel "easycoding/pkg/otel"
 	"easycoding/pkg/swagger"
 	"io/ioutil"
 	"net"
@@ -32,6 +35,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
@@ -80,12 +84,15 @@ func New(configPath string) (*Kernel, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to connect to db")
 	}
-
+	tracer, shutdownTraceFunc, err := pkg_otel.NewTracer()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to new tracer")
+	}
 	// Create a global application context.
 	ctx, cancel := context.WithCancel(context.Background())
 
 	gwServer := newGrpcGatewayServer(config, logger)
-	grpcServer := newGrpcServer(config, logger, database)
+	grpcServer := newGrpcServer(config, logger, database, tracer)
 	swaggerServer := newSwaggerServer(config)
 
 	// Build the Kernel struct with all dependencies.
@@ -97,9 +104,11 @@ func New(configPath string) (*Kernel, error) {
 		gwServer:      gwServer,
 		swaggerServer: swaggerServer,
 		state:         StateStarting,
-		shutdownFns:   []func() error{},
-		wg:            &sync.WaitGroup{},
-		context:       cancelContext{cancel: cancel, ctx: ctx},
+		shutdownFns: []func() error{
+			shutdownTraceFunc,
+		},
+		wg:      &sync.WaitGroup{},
+		context: cancelContext{cancel: cancel, ctx: ctx},
 	}
 
 	app.state = StateRunning
@@ -111,6 +120,7 @@ func newGrpcServer(
 	config *config.Config,
 	logger *logrus.Logger,
 	db *ent.Client,
+	tracer trace.Tracer,
 ) *grpc.Server {
 	opts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
@@ -120,6 +130,7 @@ func newGrpcServer(
 			validate_middleware.Interceptor(),
 			error_middleware.Interceptor(logger),
 			prometheus_middleware.Interceptor(),
+			otel_middleware.Interceptor(),
 		)),
 		grpc.MaxSendMsgSize(maxMsgSize),
 		grpc.MaxRecvMsgSize(maxMsgSize),
@@ -133,7 +144,7 @@ func newGrpcServer(
 	}
 	// Create grpc server & register grpc services.
 	grpcServer := grpc.NewServer(opts...)
-	service.RegisterServers(grpcServer, logger, db)
+	service.RegisterServers(grpcServer, logger, db, tracer)
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	grpc_prometheus.Register(grpcServer)
 	reflection.Register(grpcServer)
