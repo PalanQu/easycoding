@@ -5,6 +5,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 
 	pet_pb "easycoding/api/pet"
@@ -32,8 +33,8 @@ var endpointFuncs = []RegisterHandlerFromEndpoint{
 }
 
 // RegisterServers register grpc services.
-func RegisterServers(grpcServer *grpc.Server, logger *logrus.Logger, db *ent.Client) {
-	ping_pb.RegisterPingSvcServer(grpcServer, ping_svc.New(logger))
+func RegisterServers(grpcServer *grpc.Server, logger *logrus.Logger, db *ent.Client, tracer trace.Tracer) {
+	ping_pb.RegisterPingSvcServer(grpcServer, ping_svc.New(logger, tracer))
 	pet_pb.RegisterPetStoreSvcServer(grpcServer, pet_svc.New(logger, db))
 }
 
