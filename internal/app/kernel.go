@@ -80,13 +80,13 @@ type Kernel struct {
 func New(configPath string) (*Kernel, error) {
 	config := config.LoadConfig(configPath)
 	logger := log.New(os.Stderr, config.Log.Level, config.Log.Dir)
-	database, err := db.CreateDBClient(config)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to connect to db")
-	}
 	tracer, shutdownTraceFunc, err := pkg_otel.NewTracer()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to new tracer")
+	}
+	database, err := db.CreateDBClient(config, tracer)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to connect to db")
 	}
 	// Create a global application context.
 	ctx, cancel := context.WithCancel(context.Background())
