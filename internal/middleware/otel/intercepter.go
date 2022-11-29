@@ -11,6 +11,7 @@ func Interceptor() func(
 	ctx context.Context,
 	req interface{},
 	_ *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler) (interface{}, error) {
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
 	return otelgrpc.UnaryServerInterceptor()
 }
