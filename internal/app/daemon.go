@@ -8,8 +8,8 @@ func (k *Kernel) StartDaemons() {
 	m := daemon.NewManager(
 		k.context.ctx,
 		k.wg,
-		k.Log,
+		k.log,
 	)
 
-	go m.Start(daemon.NewExampleDaemon(k.Config.Daemon.ExampleDaemon.DurationSeconds))
+	go m.Start(daemon.NewExampleDaemon(k.config.Daemon.ExampleDaemon.DurationSeconds))
 }
