@@ -15,6 +15,7 @@
 
 ## 功能
 
+- 云原生支持prometheus指标监控，日志以及链路追踪
 - 所有接口都是由protobuf定义
 - 自动生成grpc，grpc-gateway，validate文件
 - 每个接口同时提供rest和grpc访问接口
@@ -25,6 +26,7 @@
 - 在docker中运行
 - 配置管理，配置生成
 - 数据库表结构的升级降级
+- 数据库表结构的版本管理
 - mock数据库进行单元测试
 - golang，protobuf等文件的静态检测与自动修复
 - error的分类与管理
@@ -33,6 +35,9 @@
 - 优雅停止
 - 支持启动后台进程
 - 健康检查
+
+<img src="pics/jaeger.png" style="zoom:50%;" />
+<img src="pics/grafana.png" style="zoom:50%;" />
 
 ## 运行前的依赖
 

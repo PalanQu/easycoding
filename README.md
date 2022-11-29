@@ -14,16 +14,17 @@ This project loosely follows [Uncle Bob's Clean Architecture](https://blog.clean
 
 ## Features
 
+- Cloud native with prometheus metrics, logging and trace
 - 100% API defined by protobuf
 - Auto generate grpc, grpc gateway, validate go files
 - Provide both rest api and grpc api
 - Auto generate swagger api document
 - Breaking change detection
-- Builtin prometheus metrics
 - Support import api definition by postman
 - Run in docker
 - Auto configuration generate
 - Database migrate up and down
+- Database schema version control
 - Database mock testing
 - Golang, Protobuf and basic text file linting
 - Error definition and classification
@@ -32,6 +33,9 @@ This project loosely follows [Uncle Bob's Clean Architecture](https://blog.clean
 - Graceful stop
 - Backend processes
 - Health check
+
+<img src="docs/pics/jaeger.png" style="zoom:50%;" />
+<img src="docs/pics/grafana.png" style="zoom:50%;" />
 
 ## Prerequest
 
