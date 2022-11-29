@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -9,7 +10,6 @@ import (
 
 	"easycoding/internal/app"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -26,17 +26,17 @@ var serveCmd = &cobra.Command{
 }
 
 func runServer(_ *cobra.Command, _ []string) {
-	instance := boot()
+	kernel := boot()
 
-	go instance.ListenGrpc()
-	go instance.ListenGrpcGateway()
-	go instance.ListenSwagger()
-	go instance.StartDaemons()
+	go kernel.ListenGrpc()
+	go kernel.ListenGrpcGateway()
+	go kernel.ListenSwagger()
+	go kernel.StartDaemons()
 
-	graceful(instance, 30*time.Second, instance.Log)
+	graceful(kernel, 30*time.Second)
 }
 
-func graceful(instance *app.Kernel, timeout time.Duration, logger *logrus.Logger) {
+func graceful(instance *app.Kernel, timeout time.Duration) {
 	stop := make(chan os.Signal, 1)
 
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
@@ -47,8 +47,8 @@ func graceful(instance *app.Kernel, timeout time.Duration, logger *logrus.Logger
 	defer cancel()
 
 	if err := instance.Shutdown(ctx); err != nil {
-		logger.Errorf("application shutdown error: %v\n", err)
+		log.Fatalf("application shutdown error: %v\n", err)
 	} else {
-		logger.Infoln("application stopped")
+		log.Println("application stopped")
 	}
 }

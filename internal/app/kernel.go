@@ -65,12 +65,12 @@ const (
 )
 
 type Kernel struct {
+	log           *logrus.Logger
 	gwServer      *http.Server
 	grpcServer    *grpc.Server
 	swaggerServer *http.Server
-	Config        *config.Config
-	Log           *logrus.Logger
-	DB            *ent.Client
+	config        *config.Config
+	dbClient      *ent.Client
 	state         int
 	wg            *sync.WaitGroup
 	context       cancelContext
@@ -97,9 +97,9 @@ func New(configPath string) (*Kernel, error) {
 
 	// Build the Kernel struct with all dependencies.
 	app := &Kernel{
-		Log:           logger,
-		Config:        config,
-		DB:            database,
+		log:           logger,
+		config:        config,
+		dbClient:      database,
 		grpcServer:    grpcServer,
 		gwServer:      gwServer,
 		swaggerServer: swaggerServer,
@@ -207,17 +207,17 @@ func (k *Kernel) listenAndServe(name string, listen func() error) {
 	for {
 		// If the app is stopped or stopping, don't retry to start the server.
 		if k.state == StateStopping || k.state == StateStopped {
-			k.Log.Tracef("skipping restarts of server because app is not in running state: state is %d", k.state)
+			k.log.Tracef("skipping restarts of server because app is not in running state: state is %d", k.state)
 			return
 		}
 
-		k.Log.Infof("%s started\n", name)
+		k.log.Infof("%s started\n", name)
 		if err = listen(); err != nil {
-			if k.Config.Server.RestartOnError {
-				k.Log.Infof("restart server failed after error on %v", err)
+			if k.config.Server.RestartOnError {
+				k.log.Infof("restart server failed after error on %v", err)
 				continue
 			}
-			k.Log.Infof("server failed after error on %v", err)
+			k.log.Infof("server failed after error on %v", err)
 		}
 		return
 	}
@@ -231,13 +231,14 @@ func (k *Kernel) ListenGrpcGateway() {
 		}
 		return nil
 	}
-	k.listenAndServe("grpc gateway server", listen)
+	descrition := fmt.Sprintf("grpc gateway server at %v", k.config.Server.GatewayPort)
+	k.listenAndServe(descrition, listen)
 }
 
 func (k *Kernel) ListenGrpc() {
 	listen := func() error {
 		lis, err := net.Listen(
-			"tcp", fmt.Sprintf("%s:%s", serveHost, k.Config.Server.GrpcPort))
+			"tcp", fmt.Sprintf("%s:%s", serveHost, k.config.Server.GrpcPort))
 		if err != nil {
 			return err
 		}
@@ -246,7 +247,8 @@ func (k *Kernel) ListenGrpc() {
 		}
 		return nil
 	}
-	k.listenAndServe("grpc server", listen)
+	descrition := fmt.Sprintf("grpc server at %v", k.config.Server.GrpcPort)
+	k.listenAndServe(descrition, listen)
 }
 
 func (k *Kernel) ListenSwagger() {
@@ -256,12 +258,14 @@ func (k *Kernel) ListenSwagger() {
 		}
 		return nil
 	}
-	k.listenAndServe("swagger server", listen)
+	descrition := fmt.Sprintf(
+		"swagger/metrics server at %v", k.config.Server.SwaggerPort)
+	k.listenAndServe(descrition, listen)
 }
 
 func (k *Kernel) Shutdown(ctx context.Context) error {
 	if k.state != StateRunning {
-		k.Log.Warn("Application cannot be shutdown since current state is not 'running'")
+		k.log.Warn("Application cannot be shutdown since current state is not 'running'")
 		return nil
 	}
 
@@ -272,22 +276,22 @@ func (k *Kernel) Shutdown(ctx context.Context) error {
 
 	if k.gwServer != nil {
 		if err := k.gwServer.Shutdown(ctx); err != nil {
-			k.Log.Errorf("server shutdown error: %v\n", err)
+			k.log.Errorf("server shutdown error: %v\n", err)
 		} else {
-			k.Log.Infoln("gateway server stopped")
+			k.log.Infoln("gateway server stopped")
 		}
 	}
 
 	if k.grpcServer != nil {
 		k.grpcServer.GracefulStop()
-		k.Log.Infoln("grpc server stopped")
+		k.log.Infoln("grpc server stopped")
 	}
 
 	if k.swaggerServer != nil {
 		if err := k.swaggerServer.Shutdown(ctx); err != nil {
-			k.Log.Errorf("swagger shutdown error: %v\n", err)
+			k.log.Errorf("swagger shutdown error: %v\n", err)
 		} else {
-			k.Log.Infoln("swagger server stopped")
+			k.log.Infoln("swagger server stopped")
 		}
 	}
 
@@ -303,7 +307,7 @@ func (k *Kernel) Shutdown(ctx context.Context) error {
 	for _, fn := range k.shutdownFns {
 		shutdownErr := fn()
 		if shutdownErr != nil {
-			k.Log.Errorf("shutdown function returned error: %v\n", shutdownErr)
+			k.log.Errorf("shutdown function returned error: %v\n", shutdownErr)
 		}
 	}
 
@@ -313,7 +317,7 @@ func (k *Kernel) Shutdown(ctx context.Context) error {
 	case <-done:
 	}
 
-	return k.DB.Close()
+	return k.dbClient.Close()
 }
 
 func Version() string {
