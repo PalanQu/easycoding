@@ -1,0 +1,1339 @@
+{
+    "status": "success",
+    "isPartial": false,
+    "data": {
+        "resultType": "vector",
+        "result": [
+            {
+                "metric": {},
+                "value": [
+                    1692857996,
+                    "275"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "64C128G"
+                },
+                "value": [
+                    1692857996,
+                    "26"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ace-cobra"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "aceflow"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "aceoctopus"
+                },
+                "value": [
+                    1692857996,
+                    "6"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ads"
+                },
+                "value": [
+                    1692857996,
+                    "476"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ads-dumper"
+                },
+                "value": [
+                    1692857996,
+                    "32"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ads-lambda-service"
+                },
+                "value": [
+                    1692857996,
+                    "3437"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ads-search-ranking"
+                },
+                "value": [
+                    1692857996,
+                    "113"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ads-zprofile"
+                },
+                "value": [
+                    1692857996,
+                    "15"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ads1"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "agentchendi"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "agentsmith"
+                },
+                "value": [
+                    1692857996,
+                    "3825"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "agentsmith-staging"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ann-dssm"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ann-service"
+                },
+                "value": [
+                    1692857996,
+                    "5"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "annhomefeed"
+                },
+                "value": [
+                    1692857996,
+                    "96"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "annnotefeed"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "annrecallservice"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "annservice"
+                },
+                "value": [
+                    1692857996,
+                    "16"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "annservice-offline"
+                },
+                "value": [
+                    1692857996,
+                    "3"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "arkhomefeed"
+                },
+                "value": [
+                    1692857996,
+                    "1715"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "arkhomefeed-tuning"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "arkliverec-relate"
+                },
+                "value": [
+                    1692857996,
+                    "12"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "arkwukong"
+                },
+                "value": [
+                    1692857996,
+                    "123"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "autobots"
+                },
+                "value": [
+                    1692857996,
+                    "3"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "buffer"
+                },
+                "value": [
+                    1692857996,
+                    "219"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "cat"
+                },
+                "value": [
+                    1692857996,
+                    "8"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "cobra"
+                },
+                "value": [
+                    1692857996,
+                    "4"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "content-detection"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "dasheng"
+                },
+                "value": [
+                    1692857996,
+                    "6"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "devops"
+                },
+                "value": [
+                    1692857996,
+                    "89"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "dolphin"
+                },
+                "value": [
+                    1692857996,
+                    "8"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "embedding-offline-center"
+                },
+                "value": [
+                    1692857996,
+                    "4"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "embedinggenerato"
+                },
+                "value": [
+                    1692857996,
+                    "3"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "fault-isolation"
+                },
+                "value": [
+                    1692857996,
+                    "3"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "feedsimulator"
+                },
+                "value": [
+                    1692857996,
+                    "6"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "flsstaging"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamster-writer"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamster-writer-adsrank"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamster-writer-adstopk"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb"
+                },
+                "value": [
+                    1692857996,
+                    "11"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-adsmix"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-dbwemb-online"
+                },
+                "value": [
+                    1692857996,
+                    "96"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-firstcomment"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-index"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-mm"
+                },
+                "value": [
+                    1692857996,
+                    "4"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-notefeed-breakdown"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-notefeed-zprofile"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-online"
+                },
+                "value": [
+                    1692857996,
+                    "102"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-recalldvf"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-searchfirstrank"
+                },
+                "value": [
+                    1692857996,
+                    "3"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-searchfirstrankgoodnote"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "hamsterdb-shearchfirstrank3"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "houyi-indexer"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "houyi-searcher-default"
+                },
+                "value": [
+                    1692857996,
+                    "63"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "houyi-searcher-flsrelevance"
+                },
+                "value": [
+                    1692857996,
+                    "13"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "houyi-searcher-relevance"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "inference"
+                },
+                "value": [
+                    1692857996,
+                    "605"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "jindouyun"
+                },
+                "value": [
+                    1692857996,
+                    "115"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "kafka"
+                },
+                "value": [
+                    1692857996,
+                    "57"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "kasalts-poc"
+                },
+                "value": [
+                    1692857996,
+                    "12"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "kube-tool"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "kvstorebuilder"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "lambda4growthdsp"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "lambdadb_wrapper"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "liantiao"
+                },
+                "value": [
+                    1692857996,
+                    "8"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "listwise"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "logserver-ads"
+                },
+                "value": [
+                    1692857996,
+                    "15"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "logserver-backend"
+                },
+                "value": [
+                    1692857996,
+                    "10"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "logserver-ubt-dsl"
+                },
+                "value": [
+                    1692857996,
+                    "5"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "lucky"
+                },
+                "value": [
+                    1692857996,
+                    "3687"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "lucky-ad"
+                },
+                "value": [
+                    1692857996,
+                    "243"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "lucky-test"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "mediacpu"
+                },
+                "value": [
+                    1692857996,
+                    "26"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "mediacreate"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "mediafaiss"
+                },
+                "value": [
+                    1692857996,
+                    "32"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "multimodal"
+                },
+                "value": [
+                    1692857996,
+                    "37"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "mysql"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "nearline"
+                },
+                "value": [
+                    1692857996,
+                    "8"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "nlp.nlp.nlpcutseg"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "normguardserver"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "notebreakdown-indexer"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "notefeed"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "nvwa"
+                },
+                "value": [
+                    1692857996,
+                    "167"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "nvwa-fls"
+                },
+                "value": [
+                    1692857996,
+                    "47"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "octopus"
+                },
+                "value": [
+                    1692857996,
+                    "123"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "octopus34"
+                },
+                "value": [
+                    1692857996,
+                    "3"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "ors"
+                },
+                "value": [
+                    1692857996,
+                    "75"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "prometheus"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "prometheus-ads-default"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "prometheus-agentsmith"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "prometheus-leader"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "prometheus-search"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "pushrecranker"
+                },
+                "value": [
+                    1692857996,
+                    "4"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "qogir-model"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "qos"
+                },
+                "value": [
+                    1692857996,
+                    "396"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "qp"
+                },
+                "value": [
+                    1692857996,
+                    "15"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "queryrecallengine-indexer"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "queryrecallengine-searcher"
+                },
+                "value": [
+                    1692857996,
+                    "6"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "real-time-consumer"
+                },
+                "value": [
+                    1692857996,
+                    "3"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "rec-lambda-service"
+                },
+                "value": [
+                    1692857996,
+                    "6231"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "rec-streamingindexservice"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "recall-outflow-dvf"
+                },
+                "value": [
+                    1692857996,
+                    "13"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "recall-vector-build"
+                },
+                "value": [
+                    1692857996,
+                    "4"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "recall-vector-builds"
+                },
+                "value": [
+                    1692857996,
+                    "6"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "red-elastic"
+                },
+                "value": [
+                    1692857996,
+                    "117"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "redann-lve-notefeed"
+                },
+                "value": [
+                    1692857996,
+                    "12"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "redannlve"
+                },
+                "value": [
+                    1692857996,
+                    "48"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "redcast"
+                },
+                "value": [
+                    1692857996,
+                    "30"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "redck"
+                },
+                "value": [
+                    1692857996,
+                    "277"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "redcupid"
+                },
+                "value": [
+                    1692857996,
+                    "48"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "reddedupservice"
+                },
+                "value": [
+                    1692857996,
+                    "53"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "rediscovery"
+                },
+                "value": [
+                    1692857996,
+                    "10"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "redkv-server-sh4"
+                },
+                "value": [
+                    1692857996,
+                    "4"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "rosgateway"
+                },
+                "value": [
+                    1692857996,
+                    "23"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "rosgateway-staging"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "rs"
+                },
+                "value": [
+                    1692857996,
+                    "215"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "s0"
+                },
+                "value": [
+                    1692857996,
+                    "31"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "search"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "search-lambda-service"
+                },
+                "value": [
+                    1692857996,
+                    "1125"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "search-query-rank"
+                },
+                "value": [
+                    1692857996,
+                    "9"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "search4nearline"
+                },
+                "value": [
+                    1692857996,
+                    "13"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "searchann"
+                },
+                "value": [
+                    1692857996,
+                    "4"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "searchpangu"
+                },
+                "value": [
+                    1692857996,
+                    "3"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "searchqueryrank"
+                },
+                "value": [
+                    1692857996,
+                    "122"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "searchrankingservice"
+                },
+                "value": [
+                    1692857996,
+                    "30"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "searchrankingservice-nearLine"
+                },
+                "value": [
+                    1692857996,
+                    "10"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "searchrankingservicefls"
+                },
+                "value": [
+                    1692857996,
+                    "13"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "simlr-v2-retr-server"
+                },
+                "value": [
+                    1692857996,
+                    "21"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "srechaos"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "srs"
+                },
+                "value": [
+                    1692857996,
+                    "12"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "srs-rank"
+                },
+                "value": [
+                    1692857996,
+                    "8"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "state-metrics"
+                },
+                "value": [
+                    1692857996,
+                    "8"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "thanos-query"
+                },
+                "value": [
+                    1692857996,
+                    "3"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "training"
+                },
+                "value": [
+                    1692857996,
+                    "18"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "transcode"
+                },
+                "value": [
+                    1692857996,
+                    "2"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "userprofile"
+                },
+                "value": [
+                    1692857996,
+                    "36"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "userprofile-server-online"
+                },
+                "value": [
+                    1692857996,
+                    "10"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "utcaesar"
+                },
+                "value": [
+                    1692857996,
+                    "54"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "utcaesar_inference"
+                },
+                "value": [
+                    1692857996,
+                    "166"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "utminer-exp"
+                },
+                "value": [
+                    1692857996,
+                    "9"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "video-process"
+                },
+                "value": [
+                    1692857996,
+                    "128"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "video-process-cpu"
+                },
+                "value": [
+                    1692857996,
+                    "167"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "wukong"
+                },
+                "value": [
+                    1692857996,
+                    "25"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "yangjian"
+                },
+                "value": [
+                    1692857996,
+                    "112"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "zprofile"
+                },
+                "value": [
+                    1692857996,
+                    "82"
+                ]
+            },
+            {
+                "metric": {
+                    "label_dedicate": "zprofile-shadow"
+                },
+                "value": [
+                    1692857996,
+                    "1"
+                ]
+            }
+        ]
+    }
+}

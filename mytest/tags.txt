@@ -1,0 +1,17 @@
+64C128G
+ads
+ads-dumper
+ads-lambda-service
+ads-search-ranking
+ads-zprofile
+agentsmith
+arkliverec-relate
+arkwukong
+buffer
+devops
+fault-isolation
+inference
+nvwa
+qos
+qp
+rec-lambda-service
