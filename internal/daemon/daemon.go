@@ -8,6 +8,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	stopTimeout      = 1 * time.Minute
+	recorverInterval = 5 * time.Second
+)
+
 // Daemon defines all required methods of a background daemon process.
 type Daemon interface {
 	Name() string
@@ -53,7 +58,19 @@ func (m *Manager) Start(d Daemon) {
 		// stop the restart ticket and exit the method.
 		case <-m.ctx.Done():
 			wg.Wait()
-			logger.Infof(`daemon "%s" shutdown complete`, d.Name())
+
+			shutdownComplete := make(chan struct{})
+			go func() {
+				defer close(shutdownComplete)
+				wg.Wait()
+			}()
+
+			select {
+			case <-shutdownComplete:
+				logger.Infof(`daemon "%s" shutdown complete`, d.Name())
+			case <-time.After(stopTimeout):
+				logger.Warnf(`daemon "%s" shutdown timed out`, d.Name())
+			}
 			return
 		default:
 			try++
@@ -76,7 +93,7 @@ func (m *Manager) Start(d Daemon) {
 func (m *Manager) recoverPanic(d Daemon, logger *logrus.Logger) {
 	if err := recover(); err != nil {
 		logger.Errorf("daemon exited with panic (restarting in 5 seconds): %s", err)
-		time.Sleep(5 * time.Second)
+		time.Sleep(recorverInterval)
 		m.Start(d)
 	}
 }
